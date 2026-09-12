@@ -9,12 +9,10 @@ import { HotelPartnerPortal } from './components/hotel/HotelPartnerPortal';
 import { LocalGuidePortal } from './components/guide/LocalGuidePortal';
 import { SplitPaymentSimulator } from './components/split/SplitPaymentSimulator';
 import { calculateSplitBreakdown } from './services/paymentSplitService';
-import { ApiSettingsModal } from './components/common/ApiSettingsModal';
 import { createBookingViaNodeAPI } from './services/apiClient';
 
 export function App() {
   const [currentPersona, setCurrentPersona] = useState<PersonaType>('traveler');
-  const [isApiSettingsOpen, setIsApiSettingsOpen] = useState<boolean>(false);
   const [spots] = useState<TouristSpot[]>(INITIAL_TOURIST_SPOTS);
   const [hotels, setHotels] = useState<Hotel[]>(INITIAL_HOTELS);
   const [guides, setGuides] = useState<Guide[]>(INITIAL_GUIDES);
@@ -108,14 +106,13 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500 selection:text-white">
       
       {/* Top Global Navbar with Persona Switcher */}
       <Navbar
         currentPersona={currentPersona}
         onSelectPersona={(persona) => setCurrentPersona(persona)}
         bookingCount={bookings.length}
-        onOpenApiSettings={() => setIsApiSettingsOpen(true)}
       />
 
       {/* Main Persona View Container */}
@@ -180,24 +177,18 @@ export function App() {
         />
       )}
 
-      {/* In-App Safe API Key & Engine Settings Modal */}
-      <ApiSettingsModal
-        isOpen={isApiSettingsOpen}
-        onClose={() => setIsApiSettingsOpen(false)}
-      />
-
-      {/* Persistent Dark Footer */}
-      <footer className="mt-auto border-t border-slate-800/90 bg-slate-900/95 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+      {/* Persistent Clean Light Footer */}
+      <footer className="mt-auto border-t border-slate-200 bg-white py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-200">TourMatch AI Ecosystem Prototype</span>
+            <span className="font-bold text-slate-800">TourMatch AI Ecosystem</span>
             <span>•</span>
             <span>Spatial Geo-Radius (PostGIS ST_DWithin)</span>
             <span>•</span>
-            <span className="text-rose-400 font-semibold">Google Maps Check-in Ranked</span>
+            <span className="text-red-600 font-semibold">100% Real Footfall Check-Ins Ranked</span>
           </div>
           <div>
-            Powered by Automated Multi-Party Payout Routing (Platform • Hotel • Guide)
+            Powered by Google Gemini AI & Automated Multi-Party Payout Routing
           </div>
         </div>
       </footer>

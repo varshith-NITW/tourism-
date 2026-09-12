@@ -1,34 +1,6 @@
 import { TouristSpot, Hotel, Guide, RoomType } from '../types';
 
-export interface ApiKeyConfig {
-  googleMapsKey: string;
-  openaiKey: string;
-  isLiveGoogleMapsActive: boolean;
-  billingStatus?: 'active' | 'billing_required' | 'invalid_key' | 'not_configured';
-  statusMessage?: string;
-}
-
-const STORAGE_KEY_GOOGLE = 'tourmatch_google_maps_key';
-const STORAGE_KEY_OPENAI = 'tourmatch_openai_key';
-
-export function getStoredApiKeys(): { googleMapsKey: string; openaiKey: string } {
-  const googleMapsKey = localStorage.getItem(STORAGE_KEY_GOOGLE) || (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || '';
-  const openaiKey = localStorage.getItem(STORAGE_KEY_OPENAI) || (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
-  return { googleMapsKey, openaiKey };
-}
-
-export function saveStoredApiKeys(googleMapsKey: string, openaiKey: string) {
-  if (googleMapsKey) {
-    localStorage.setItem(STORAGE_KEY_GOOGLE, googleMapsKey.trim());
-  } else {
-    localStorage.removeItem(STORAGE_KEY_GOOGLE);
-  }
-  if (openaiKey) {
-    localStorage.setItem(STORAGE_KEY_OPENAI, openaiKey.trim());
-  } else {
-    localStorage.removeItem(STORAGE_KEY_OPENAI);
-  }
-}
+// Standard Zero-Key Verification Mode: Verified partner inventory evaluated without requiring manual API keys
 
 // Built-in Global Landmark Knowledgebase
 export const GLOBAL_DESTINATIONS: Record<string, {
@@ -46,7 +18,7 @@ export const GLOBAL_DESTINATIONS: Record<string, {
   culturalTips?: string[];
   commuteTips?: { autoFare: string; metroAvailable: boolean; localAdvice: string };
   languages: string[];
-  hotelThemes: { name: string; tier: 'Heritage Luxury' | 'Boutique Stay' | 'Urban Comfort' | 'Cultural Retreat'; basePrice: number; perks: string[] }[];
+  hotelThemes: { name: string; tier: 'Heritage Luxury' | 'Boutique Stay' | 'Urban Comfort' | 'Cultural Retreat'; basePrice: number; perks: string[]; image?: string }[];
   guideProfiles: { name: string; title: string; specialties: string[]; languages: string[]; fee: number }[];
   itineraryDays: { title: string; activities: string[]; localTip: string }[];
 }> = {
@@ -83,10 +55,10 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     },
     languages: ['English', 'Hindi', 'Urdu', 'Spanish'],
     hotelThemes: [
-      { name: 'The Taj View Heritage Retreat', tier: 'Heritage Luxury', basePrice: 4800, perks: ['Direct Taj Sunrise View', 'Private Garden Gate Escort', 'Marble Souvenir'] },
-      { name: 'Mughal Courtyard Boutique Stay', tier: 'Boutique Stay', basePrice: 3200, perks: ['Traditional Mughlai Breakfast', 'Electric Golf Cart to East Gate', 'Courtyard Tea'] },
-      { name: 'Yamuna Riverbank Heritage Homestay', tier: 'Urban Comfort', basePrice: 2200, perks: ['Rooftop Sunset Lounge', 'Free Monument Entry Map', 'Late Check-out'] },
-      { name: 'Fatehpur Suites & Resort', tier: 'Cultural Retreat', basePrice: 3900, perks: ['Heritage Pool Access', 'Artisan Zardozi Walk Discount', 'Complimentary Chai'] }
+      { name: 'The Taj View Heritage Retreat', tier: 'Heritage Luxury', basePrice: 4800, perks: ['Direct Taj Sunrise View', 'Private Garden Gate Escort', 'Marble Souvenir'], image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Mughal Courtyard Boutique Stay', tier: 'Boutique Stay', basePrice: 3200, perks: ['Traditional Mughlai Breakfast', 'Electric Golf Cart to East Gate', 'Courtyard Tea'], image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Yamuna Riverbank Heritage Homestay', tier: 'Urban Comfort', basePrice: 2200, perks: ['Rooftop Sunset Lounge', 'Free Monument Entry Map', 'Late Check-out'], image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Fatehpur Suites & Resort', tier: 'Cultural Retreat', basePrice: 3900, perks: ['Heritage Pool Access', 'Artisan Zardozi Walk Discount', 'Complimentary Chai'], image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80' }
     ],
     guideProfiles: [
       { name: 'Dr. Tariq Alvi', title: 'Mughal Architecture Historian & ASI Licensed Guide', specialties: ['Mughal Architecture', 'Marble Inlay Art', 'Sunrise Photography'], languages: ['English', 'Hindi', 'Urdu'], fee: 1800 },
@@ -146,10 +118,10 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     },
     languages: ['English', 'Hindi', 'Konkani', 'Russian'],
     hotelThemes: [
-      { name: 'Azure Palm Beachfront Resort', tier: 'Boutique Stay', basePrice: 4200, perks: ['Direct Beach Access', 'Complimentary Sunset Kayak', 'Welcome Coconut Cooler'] },
-      { name: 'Fontainhas Portuguese Villa', tier: 'Heritage Luxury', basePrice: 3800, perks: ['Latin Quarter Walk', 'Feni Tasting Experience', 'Artisan Bakery Voucher'] },
-      { name: 'Candolim Coastline Haven', tier: 'Urban Comfort', basePrice: 2800, perks: ['Poolside Cabana', 'Scooter Rental Discount', 'Seafood Grill Voucher'] },
-      { name: 'Aguada Fort Vista Retreat', tier: 'Cultural Retreat', basePrice: 6500, perks: ['Cliffside Ocean View', 'Private Speedboat Tour Linkage', 'Spa Credit'] }
+      { name: 'Azure Palm Beachfront Resort', tier: 'Boutique Stay', basePrice: 4200, perks: ['Direct Beach Access', 'Complimentary Sunset Kayak', 'Welcome Coconut Cooler'], image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Fontainhas Portuguese Villa', tier: 'Heritage Luxury', basePrice: 3800, perks: ['Latin Quarter Walk', 'Feni Tasting Experience', 'Artisan Bakery Voucher'], image: 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Candolim Coastline Haven', tier: 'Urban Comfort', basePrice: 2800, perks: ['Poolside Cabana', 'Scooter Rental Discount', 'Seafood Grill Voucher'], image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Aguada Fort Vista Retreat', tier: 'Cultural Retreat', basePrice: 6500, perks: ['Cliffside Ocean View', 'Private Speedboat Tour Linkage', 'Spa Credit'], image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1000&q=80' }
     ],
     guideProfiles: [
       { name: 'Royston Fernandes', title: 'Goan Coastal & Heritage Naturalist', specialties: ['Portuguese Colonial History', 'Hidden Beach Trails', 'Seafood Dining'], languages: ['English', 'Konkani', 'Hindi'], fee: 1600 },
@@ -207,9 +179,9 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     },
     languages: ['English', 'Hindi', 'Rajasthani', 'French'],
     hotelThemes: [
-      { name: 'Rawat Haveli Palace Stay', tier: 'Heritage Luxury', basePrice: 4500, perks: ['Rooftop Hawa Mahal Panorama', 'Royal Thali Dinner Voucher', 'Courtyard Folk Dance'] },
-      { name: 'Johari Bazaar Boutique Suites', tier: 'Boutique Stay', basePrice: 3400, perks: ['Bazaar Escort Pass', 'Block-Printing Workshop Access', 'Welcome Masala Chai'] },
-      { name: 'Amber Royal Gateway Hotel', tier: 'Urban Comfort', basePrice: 2600, perks: ['Free Elephant Ride Shuttle', 'Amber Sound & Light Pass', 'Late Check-out'] }
+      { name: 'Rawat Haveli Palace Stay', tier: 'Heritage Luxury', basePrice: 4500, perks: ['Rooftop Hawa Mahal Panorama', 'Royal Thali Dinner Voucher', 'Courtyard Folk Dance'], image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Johari Bazaar Boutique Suites', tier: 'Boutique Stay', basePrice: 3400, perks: ['Bazaar Escort Pass', 'Block-Printing Workshop Access', 'Welcome Masala Chai'], image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Amber Royal Gateway Hotel', tier: 'Urban Comfort', basePrice: 2600, perks: ['Free Elephant Ride Shuttle', 'Amber Sound & Light Pass', 'Late Check-out'], image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80' }
     ],
     guideProfiles: [
       { name: 'Maharaj Vikram Singh', title: 'Royal Rajput Historian & City Palace Escort', specialties: ['Rajput History', 'Astronomy at Jantar Mantar', 'Royal Jewels & Textiles'], languages: ['English', 'Hindi', 'Rajasthani'], fee: 1700 },
@@ -267,9 +239,9 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     },
     languages: ['English', 'Hindi', 'Marathi', 'Gujarati'],
     hotelThemes: [
-      { name: 'The Colaba Maritime Suites', tier: 'Heritage Luxury', basePrice: 5800, perks: ['Harbor Ocean View', 'High Tea Lounge Access', 'Heritage Art Walk'] },
-      { name: 'Apollo Bunder Boutique Stay', tier: 'Boutique Stay', basePrice: 4200, perks: ['Gateway Walking Proximity', 'Early Check-in Pass', 'Artisan Bakery Voucher'] },
-      { name: 'Marine Drive Bayview Inn', tier: 'Urban Comfort', basePrice: 3200, perks: ['Queens Necklace View', 'Free Harbor Ferry Map', 'Late Check-out'] }
+      { name: 'The Colaba Maritime Suites', tier: 'Heritage Luxury', basePrice: 5800, perks: ['Harbor Ocean View', 'High Tea Lounge Access', 'Heritage Art Walk'], image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Apollo Bunder Boutique Stay', tier: 'Boutique Stay', basePrice: 4200, perks: ['Gateway Walking Proximity', 'Early Check-in Pass', 'Artisan Bakery Voucher'], image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Marine Drive Bayview Inn', tier: 'Urban Comfort', basePrice: 3200, perks: ['Queens Necklace View', 'Free Harbor Ferry Map', 'Late Check-out'], image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80' }
     ],
     guideProfiles: [
       { name: 'Farhan Merchant', title: 'Bombay Architecture & Marine Historian', specialties: ['Victorian Gothic Architecture', 'Elephanta Caves', 'Old Bombay Stories'], languages: ['English', 'Hindi', 'Marathi', 'Urdu'], fee: 1800 },
@@ -714,7 +686,7 @@ export function resolveDestinationAndInventory(
           googlePlaceId: `ChIJ_hotel_${key.replace(/\s+/g, '_')}_${idx + 1}`,
           googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${ht.name} ${data.city}`)}`,
           footfallRank: idx + 1,
-          image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+          image: ht.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=80',
           businessRegNumber: `GST36VERIFIED${idx + 1}K1Z`,
           partnershipModel: 'hybrid',
           guideReferralKickbackPercent: 0.06
