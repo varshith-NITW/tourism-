@@ -14,7 +14,31 @@ export const INITIAL_TOURIST_SPOTS: TouristSpot[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Charminar+Hyderabad',
     monthlyCheckins: 245000,
     checkinTrend: 'surging',
-    bestTimeToVisit: 'Early morning (08:30 AM) or sunset illuminated (06:30 PM)'
+    bestTimeToVisit: 'Early morning (08:30 AM) or sunset illuminated (06:30 PM)',
+    catchyLine: '400 years of royal pearls & steaming Irani chai whisper through timeless bazaars.',
+    bestPic: 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello / Greetings', translation: 'Namaskaram (నమస్కారం) / Adab (آداب)', pronunciation: 'Nah-mas-kahr-am', context: 'Universal polite greeting' },
+      { phrase: 'How much is this?', translation: 'Idhi entha? (ఇది ఎంత?) / Yeh kitne ka hai?', pronunciation: 'Ee-dhee en-thah?', context: 'Essential for bazaar bargaining' },
+      { phrase: 'Can you reduce the price?', translation: 'Koncham thagginchandi (కొంచెం తగ్గించండి)', pronunciation: 'Kone-chum thug-gin-chun-dee', context: 'Polite bargaining phrase' },
+      { phrase: 'Where is authentic Biryani?', translation: 'Manchi Biryani ekkada? (మంచి బిర్యానీ ఎక్కడ?)', pronunciation: 'Mun-chee bir-yah-nee ek-kuh-dah?', context: 'Food navigation' },
+      { phrase: 'Thank you very much!', translation: 'Chala Dhanyavadhalu (చాలా ధన్యవాదాలు)', pronunciation: 'Chah-lah dhun-yah-vah-dha-loo', context: 'Expressing warm gratitude' }
+    ],
+    foodMustEats: [
+      { name: 'Irani Chai & Osmania Biscuits', spot: 'Nimrah Cafe & Bakery (Opposite Charminar)', tip: 'Dip the warm salted biscuit into the rich cardamom milk tea.' },
+      { name: 'Kacche Gosht ki Hyderabadi Dum Biryani', spot: 'Hotel Shadab (Ghansi Bazaar)', tip: 'Served with fiery Mirchi ka Salan and Dahi Chutney.' },
+      { name: 'Pista House Mutton Haleem & Zafrani Chai', spot: 'Pista House Charminar Outpost', tip: 'Slow-cooked with pure ghee and broken wheat.' }
+    ],
+    culturalTips: [
+      'Remove footwear at monument mosque steps and wear respectful shoulder/knee attire.',
+      'Bargaining is expected in Laad Bazaar; politely start at 60-70% of quoted price for glass bangles.',
+      'Best photography light is 08:30 AM or 06:45 PM when monument spotlights activate.'
+    ],
+    commuteTips: {
+      autoFare: '₹60-100 within Old City; ₹200 from Railway Station; ₹750 from Airport.',
+      metroAvailable: true,
+      localAdvice: 'Take the Metro to MGBS station, then hop on an electric rickshaw for ₹30.'
+    }
   },
   {
     id: 'spot-golconda',
@@ -29,7 +53,26 @@ export const INITIAL_TOURIST_SPOTS: TouristSpot[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Golconda+Fort+Hyderabad',
     monthlyCheckins: 168000,
     checkinTrend: 'high',
-    bestTimeToVisit: '03:30 PM to catch the hilltop golden hour and sound & light show'
+    bestTimeToVisit: '03:30 PM to catch the hilltop golden hour and sound & light show',
+    catchyLine: 'A single clap at the grand iron gate echoes 1 kilometer up to the hilltop royal pavilion.',
+    bestPic: 'https://images.unsplash.com/photo-1606298855672-3efb620b7537?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'How far is the top?', translation: 'Paiki entha dhooram? (పైకి ఎంత దూరం?)', pronunciation: 'Pie-kee en-thah dhoo-rum?', context: 'Asking about the 360-step climb' },
+      { phrase: 'Do you have drinking water?', translation: 'Manchi neellu unnaaya? (మంచి నీళ్లు ఉన్నాయా?)', pronunciation: 'Mun-chee neel-loo oon-nah-yah?', context: 'Hydration during fort hike' },
+      { phrase: 'Wait here for 1 hour', translation: 'Oka ganta ikkade undandi (ఒక గంట ఇక్కడే ఉండండి)', pronunciation: 'Oh-kah gun-tah ik-kuh-day oon-dun-dee', context: 'Telling auto driver to wait' }
+    ],
+    foodMustEats: [
+      { name: 'Khubani ka Meetha (Apricot dessert)', spot: 'Heritage Fort Terrace Cafe', tip: 'Topped with thick malai clotted cream.' }
+    ],
+    culturalTips: [
+      'Wear sturdy sneakers for the 360 ancient stone stairs to the Baradari pavilion.',
+      'The acoustic clapping portico at Fateh Darwaza was used as an early warning telegraph system.'
+    ],
+    commuteTips: {
+      autoFare: '₹120-150 from Banjara Hills; ₹180 from Hitech City.',
+      metroAvailable: false,
+      localAdvice: 'Book an app cab or hire a pre-arranged return auto as return taxis can be scarce after sunset.'
+    }
   },
   {
     id: 'spot-chowmahalla',
@@ -44,7 +87,25 @@ export const INITIAL_TOURIST_SPOTS: TouristSpot[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Chowmahalla+Palace+Hyderabad',
     monthlyCheckins: 94000,
     checkinTrend: 'steady',
-    bestTimeToVisit: '10:30 AM for natural sunlight inside the grand Khilwat Mubarak hall'
+    bestTimeToVisit: '10:30 AM for natural sunlight inside the grand Khilwat Mubarak hall',
+    catchyLine: 'Walk the mirrored royal corridors of the Nizams, once the wealthiest rulers on earth.',
+    bestPic: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Where is the Vintage Car Gallery?', translation: 'Vintage car exhibition ekkada? (వింటేజ్ కార్ ఎగ్జిబిషన్ ఎక్కడ?)', pronunciation: 'Vin-tij kahr ek-zee-bi-shun ek-kuh-dah?', context: 'Navigating palace courtyards' },
+      { phrase: 'Is photography allowed inside?', translation: 'Lopala photos theeyocha? (లోపల ఫోటోలు తీయొచ్చా?)', pronunciation: 'Loh-puh-lah foh-tohs thee-yoh-chah?', context: 'Camera permissions' }
+    ],
+    foodMustEats: [
+      { name: 'Double Ka Meetha (Royal Bread Pudding)', spot: 'Subhan Bakery & Sweets nearby', tip: 'Infused with pure saffron and toasted cashew nuts.' }
+    ],
+    culturalTips: [
+      'Flash photography is strictly prohibited inside the Belgian chandelier durbar hall.',
+      'Allow at least 90 minutes to stroll through the four royal courtyards and gardens.'
+    ],
+    commuteTips: {
+      autoFare: '₹50-70 from Charminar; ₹120 from Nampally Station.',
+      metroAvailable: true,
+      localAdvice: 'Located just 1.2 km west of Charminar, easily walkable through Laad Bazaar.'
+    }
   },
   {
     id: 'spot-salarjung',
@@ -59,7 +120,25 @@ export const INITIAL_TOURIST_SPOTS: TouristSpot[] = [
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Salar+Jung+Museum+Hyderabad',
     monthlyCheckins: 115000,
     checkinTrend: 'high',
-    bestTimeToVisit: '11:45 AM to gather around the famous mechanical clock show at 12:00 PM'
+    bestTimeToVisit: '11:45 AM to gather around the famous mechanical clock show at 12:00 PM',
+    catchyLine: '38 galleries of priceless global treasures, sculpted marble veils, and mechanical clocks.',
+    bestPic: 'https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Where is the Veiled Rebecca statue?', translation: 'Veiled Rebecca vigraham ekkada? (వీల్డ్ రెబెక్కా విగ్రహం ఎక్కడ?)', pronunciation: 'Veeld Reh-bek-kah vig-ruh-hum ek-kuh-dah?', context: 'Finding the museum masterpiece' },
+      { phrase: 'When does the clock strike?', translation: 'Gadiyaram enni gantulaki kottudhi? (గడియారం ఎన్ని గంటలకి కొట్టుద్ది?)', pronunciation: 'Guh-dee-yah-rum en-nee gun-tuh-luh-kee kot-tuh-dhee?', context: 'Timing the mechanical show' }
+    ],
+    foodMustEats: [
+      { name: 'Badam Milk & Lassi', spot: 'Famous Ice Cream (Mozamjahi Market - 10 min away)', tip: 'Hand-churned seasonal fruit ice creams since 1951.' }
+    ],
+    culturalTips: [
+      'Cloakroom is mandatory for backpacks and large bags before entry.',
+      'Arrive at the central courtyard at 11:50 AM to get front-row view of the 12:00 PM clock miniature soldier emergence.'
+    ],
+    commuteTips: {
+      autoFare: '₹60-90 from Koti; ₹150 from Secunderabad Station.',
+      metroAvailable: true,
+      localAdvice: 'Salar Jung Museum Metro Station on Green Line is only 400m away.'
+    }
   }
 ];
 

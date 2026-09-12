@@ -17,6 +17,12 @@ export interface TouristSpot {
   monthlyCheckins: number;
   checkinTrend: 'surging' | 'high' | 'steady';
   bestTimeToVisit: string;
+  catchyLine?: string;
+  bestPic?: string;
+  culturalTips?: string[];
+  foodMustEats?: { name: string; spot: string; tip: string }[];
+  survivalPhrases?: { phrase: string; translation: string; pronunciation: string; context: string }[];
+  commuteTips?: { autoFare: string; metroAvailable: boolean; localAdvice: string };
 }
 
 export interface RoomType {

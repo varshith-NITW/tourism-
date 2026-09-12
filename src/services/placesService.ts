@@ -39,6 +39,12 @@ export const GLOBAL_DESTINATIONS: Record<string, {
   category: string;
   monthlyCheckins: number;
   highlight: string;
+  catchyLine?: string;
+  bestPic?: string;
+  survivalPhrases?: { phrase: string; translation: string; pronunciation: string; context: string }[];
+  foodMustEats?: { name: string; spot: string; tip: string }[];
+  culturalTips?: string[];
+  commuteTips?: { autoFare: string; metroAvailable: boolean; localAdvice: string };
   languages: string[];
   hotelThemes: { name: string; tier: 'Heritage Luxury' | 'Boutique Stay' | 'Urban Comfort' | 'Cultural Retreat'; basePrice: number; perks: string[] }[];
   guideProfiles: { name: string; title: string; specialties: string[]; languages: string[]; fee: number }[];
@@ -52,6 +58,29 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'UNESCO World Heritage Site',
     monthlyCheckins: 142000,
     highlight: 'Ivory-white marble mausoleum on the south bank of the Yamuna river',
+    catchyLine: 'Ivory-white marble whispers an immortal emperor\'s love beside the moonlit Yamuna.',
+    bestPic: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello / Greetings', translation: 'Namaste (नमस्ते) / Salaam (سلام)', pronunciation: 'Nah-mas-tay', context: 'Warm polite greeting' },
+      { phrase: 'Where is the East Gate?', translation: 'East Gate kahan hai? (ईस्ट गेट कहाँ है?)', pronunciation: 'East Gate kah-hahn high?', context: 'Finding lowest-footfall gate' },
+      { phrase: 'Can you give a discount?', translation: 'Thoda kam karo bhai (थोड़ा कम करो भाई)', pronunciation: 'Tho-dah kum kuh-ro bhye', context: 'Bargaining with marble artisans' },
+      { phrase: 'Take me to Mehtab Bagh', translation: 'Mehtab Bagh le chalo (मेहताब बाग ले चलो)', pronunciation: 'Meh-tahb Bahg lay chuh-loh', context: 'Sunset photography transit' }
+    ],
+    foodMustEats: [
+      { name: 'Angoori Petha & Kesar Petha', spot: 'Panchi Petha (Hari Parbat Branch)', tip: 'Translucent candied ash gourd simmered in pure saffron syrup.' },
+      { name: 'Bedmi Puri with Spicy Aloo Sabzi', spot: 'Deviram Sweets (Pratap Pura)', tip: 'Crispy urad dal stuffed puffed breads with fiery fenugreek gravy.' },
+      { name: 'Mughlai Mutton Korma', spot: 'Peshawri (Fatehabad Road)', tip: 'Slow simmered in rich cashew paste and whole aromatic spices.' }
+    ],
+    culturalTips: [
+      'Tripods and large bags are strictly prohibited; free cloakroom is available at entry.',
+      'Shoe covers are mandatory before stepping onto the white marble plinth.',
+      'Closed every Friday for active prayer services.'
+    ],
+    commuteTips: {
+      autoFare: '₹80-120 within Tajganj; ₹200 from Agra Cantt Station.',
+      metroAvailable: true,
+      localAdvice: 'Motor vehicles banned within 500m of gates; take the electric eco-cart from the parking lot.'
+    },
     languages: ['English', 'Hindi', 'Urdu', 'Spanish'],
     hotelThemes: [
       { name: 'The Taj View Heritage Retreat', tier: 'Heritage Luxury', basePrice: 4800, perks: ['Direct Taj Sunrise View', 'Private Garden Gate Escort', 'Marble Souvenir'] },
@@ -94,6 +123,27 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'Coastal Paradise & Portuguese Heritage',
     monthlyCheckins: 185000,
     highlight: 'Sun-drenched Arabian sea coastline with vibrant beach shacks and colonial architecture',
+    catchyLine: 'Golden sun-drenched sands meet Portuguese colonial charm and fresh coastal breeze.',
+    bestPic: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'How are you?', translation: 'Kitem chol-lam? (कसलें चल्लां?)', pronunciation: 'Ki-tem chol-lahm?', context: 'Friendly Konkani greeting' },
+      { phrase: 'Please serve fish thali', translation: 'Maka nuste thali di (म्हाका नुस्तें थाळी दी)', pronunciation: 'Mah-kah noos-tay thah-lee dee', context: 'Ordering coastal seafood' },
+      { phrase: 'How much is the scooter?', translation: 'Scooter kitlyak? (स्कूटर कितल्याक?)', pronunciation: 'Scooter kit-lyahk?', context: 'Daily bike rental' },
+      { phrase: 'Thank you very much', translation: 'Dev borem korum (देव बरें करूं)', pronunciation: 'Dev boh-rem koh-room', context: 'Goan blessing of gratitude' }
+    ],
+    foodMustEats: [
+      { name: 'Goan Kingfish Rava Fry & Fish Thali', spot: 'Vinayak Family Restaurant (Assagao)', tip: 'Semolina crusted fish served with fiery sol kadhi and crab xacuti.' },
+      { name: 'Warm Bebinca & Poi Bread', spot: 'Pasteleria Confeitaria 31 De Janeiro (Fontainhas)', tip: 'Traditional 7-layer coconut milk and ghee dessert.' }
+    ],
+    culturalTips: [
+      'Cover shoulders and knees when visiting Old Goa churches and inland temples.',
+      'Loud beach music is prohibited after 10:00 PM along turtle nesting shores.'
+    ],
+    commuteTips: {
+      autoFare: 'Scooter rental ₹350-500/day; GoaMiles app cab is 40% cheaper than street taxis.',
+      metroAvailable: false,
+      localAdvice: 'Rent a verified helmeted scooter or pre-book through GoaMiles taxi app for transparent rates.'
+    },
     languages: ['English', 'Hindi', 'Konkani', 'Russian'],
     hotelThemes: [
       { name: 'Azure Palm Beachfront Resort', tier: 'Boutique Stay', basePrice: 4200, perks: ['Direct Beach Access', 'Complimentary Sunset Kayak', 'Welcome Coconut Cooler'] },
@@ -135,6 +185,26 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'UNESCO Royal Heritage',
     monthlyCheckins: 110000,
     highlight: 'Iconic pink sandstone palace with 953 honeycombed jharokhas and royal bazaars',
+    catchyLine: '953 latticed royal windows glow crimson pink across centuries of Rajput valor.',
+    bestPic: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Royal Greeting', translation: 'Khamma Ghani (खम्मा घणी)', pronunciation: 'Khum-mah Ghuh-nee', context: 'Traditional Rajasthani greeting' },
+      { phrase: 'Please lower the price', translation: 'Thoda kam karo sa (थोड़ा कम करो सा)', pronunciation: 'Tho-dah kum kuh-roh sah', context: 'Courteous bazaar bargaining' },
+      { phrase: 'One strong tea please', translation: 'Ek kadak chai dena (एक कड़क चाय देना)', pronunciation: 'Ayk kuh-duck chye day-nah', context: 'Street chai order' }
+    ],
+    foodMustEats: [
+      { name: 'Dal Baati Churma with Desi Ghee', spot: 'Laxmi Mishthan Bhandar - LMB (Johari Bazaar)', tip: 'Crisp baked wheat balls crushed with hot spicy lentils and sweetened crumble.' },
+      { name: 'Rawat ki Pyaz Kachori', spot: 'Rawat Mishthan Bhandar (Station Road)', tip: 'Piping hot flaky pastry filled with caramelized spiced onions.' }
+    ],
+    culturalTips: [
+      'Remove footwear at temple shrines inside Amber Fort and City Palace.',
+      'Check for government hologram certificates when purchasing blue pottery.'
+    ],
+    commuteTips: {
+      autoFare: '₹80-120 within Old Pink City; ₹150 to Amber Fort.',
+      metroAvailable: true,
+      localAdvice: 'Take the Pink Line Metro from Railway Station to Chandpole Gate for ₹20.'
+    },
     languages: ['English', 'Hindi', 'Rajasthani', 'French'],
     hotelThemes: [
       { name: 'Rawat Haveli Palace Stay', tier: 'Heritage Luxury', basePrice: 4500, perks: ['Rooftop Hawa Mahal Panorama', 'Royal Thali Dinner Voucher', 'Courtyard Folk Dance'] },
@@ -175,6 +245,26 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'Colonial Maritime Heritage & Harbor',
     monthlyCheckins: 165000,
     highlight: 'Iconic basalt arch monument overlooking Mumbai Harbor and the Arabian Sea',
+    catchyLine: 'Where the Arabian sea mist meets colonial basalt arches and the city of unstoppable dreams.',
+    bestPic: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'How are you?', translation: 'Kasa kay? (कसं काय?)', pronunciation: 'Kuh-suh kye?', context: 'Friendly Marathi greeting' },
+      { phrase: 'Please start the meter', translation: 'Meter chalu karo bhaiya (मीटर चालू करो भैया)', pronunciation: 'Meter chah-loo kuh-ro bhye-yah', context: 'Mandatory for Kaali Peeli taxis' },
+      { phrase: 'One cutting chai', translation: 'Ek cutting chai (एक कटिंग चाय)', pronunciation: 'Ayk cut-ting chye', context: 'Half cup spiced strong tea' }
+    ],
+    foodMustEats: [
+      { name: 'Bun Maska & Irani Chai', spot: 'Kyani & Co. (Marine Lines)', tip: 'Dip buttery crusty bun into sweet condensed milk tea.' },
+      { name: 'Hot Vada Pav with Dry Garlic Chutney', spot: 'Aram Vada Pav (Opposite CST Station)', tip: 'Mumbai iconic street staple served fresh every 2 minutes.' }
+    ],
+    culturalTips: [
+      'Taxis must strictly run by the electronic meter; avoid flat rate solicitations.',
+      'Best sunset panorama is along Marine Drive Promenade at 06:15 PM.'
+    ],
+    commuteTips: {
+      autoFare: 'Kaali Peeli taxis start at ₹28 minimum; Local AC suburban trains are fastest.',
+      metroAvailable: true,
+      localAdvice: 'Take Aqua Metro Line 3 or Harbor Line to bypass south Mumbai traffic.'
+    },
     languages: ['English', 'Hindi', 'Marathi', 'Gujarati'],
     hotelThemes: [
       { name: 'The Colaba Maritime Suites', tier: 'Heritage Luxury', basePrice: 5800, perks: ['Harbor Ocean View', 'High Tea Lounge Access', 'Heritage Art Walk'] },
@@ -215,6 +305,26 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'Ancient Spiritual Capital & Sacred Riverfront',
     monthlyCheckins: 135000,
     highlight: 'Sacred riverfront ghats with continuous spiritual rituals and ancient winding alleys',
+    catchyLine: 'Thousands of oil lamps float on holy waters where ancient chants echo into eternity.',
+    bestPic: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Spiritual Greeting', translation: 'Har Har Mahadev (हर हर महादेव)', pronunciation: 'Hahr Hahr Muh-hah-dayv', context: 'Universal Varanasi greeting' },
+      { phrase: 'Where is the Ghat?', translation: 'Ghat ka rasta kidhar hai? (घाट का रास्ता किधर है?)', pronunciation: 'Ghaht kah rus-tah kidh-uhr high?', context: 'Alley navigation' },
+      { phrase: 'How much for the boat?', translation: 'Boat ka kitna loge? (नाव का कितना लोगे?)', pronunciation: 'Naav kah kit-nah loh-gay?', context: 'Morning sunrise boat hire' }
+    ],
+    foodMustEats: [
+      { name: 'Blue Lassi & Seasonal Malaiyo', spot: 'Blue Lassi Shop (Manikarnika Ghat Lane)', tip: 'Hand-whipped creamy yogurt lassi topped with roasted pistachios and pomegranates.' },
+      { name: 'Crispy Kachori Sabzi & Jalebi', spot: 'Ram Bhandar (Chowk)', tip: 'Available fresh at 07:00 AM; sells out before 10:30 AM.' }
+    ],
+    culturalTips: [
+      'Strictly do not photograph cremation ceremonies at Manikarnika or Harishchandra Ghats.',
+      'Dress modestly covering shoulders and knees along temple streets.'
+    ],
+    commuteTips: {
+      autoFare: '₹50-80 for electric rickshaws; private rowboat ₹300-500 for sunrise tour.',
+      metroAvailable: false,
+      localAdvice: 'The old riverside alleys (galis) are entirely pedestrian; explore on foot.'
+    },
     languages: ['English', 'Hindi', 'Sanskrit', 'Bengali'],
     hotelThemes: [
       { name: 'Ganges View Heritage Haveli', tier: 'Heritage Luxury', basePrice: 3600, perks: ['Direct Riverfront Balcony', 'Sunrise Rowboat Included', 'Rooftop Yoga'] },
@@ -294,6 +404,26 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'Iconic Global Architectural Wonder',
     monthlyCheckins: 290000,
     highlight: 'Wrought-iron lattice tower on the Champ de Mars with panoramic city vistas',
+    catchyLine: 'Golden wrought-iron lace towers above the Seine, serenading the world with romance.',
+    bestPic: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello, good day', translation: 'Bonjour, comment allez-vous?', pronunciation: 'Bohn-zhoor, kom-mohn tah-lay voo?', context: 'Mandatory polite greeting before asking anything' },
+      { phrase: 'Do you speak English?', translation: 'Parlez-vous anglais?', pronunciation: 'Par-lay voo ahn-glay?', context: 'Friendly language bridge' },
+      { phrase: 'The bill please', translation: "L'addition, s'il vous plaît", pronunciation: 'Lah-dee-syohn seel voo play', context: 'Bistro dining' }
+    ],
+    foodMustEats: [
+      { name: 'Fresh Butter Croissant & Café Crème', spot: 'Du Pain et des Idées (10th Arr.)', tip: 'Flaky layers baked with Normandy churned butter.' },
+      { name: 'Authentic Boeuf Bourguignon', spot: 'Chez René (Saint-Germain)', tip: 'Slow cooked beef braised in red Burgundy wine with pearl onions.' }
+    ],
+    culturalTips: [
+      'Always greet shopkeepers with a warm "Bonjour" upon entering any boutique or cafe.',
+      'Keep your metro ticket handy until you completely exit the turnstiles.'
+    ],
+    commuteTips: {
+      autoFare: 'Metro single ticket €2.15; RER train €11.80 from Airport.',
+      metroAvailable: true,
+      localAdvice: 'Metro Line 6 gives breathtaking open-air vistas of Eiffel Tower over Bir-Hakeim bridge.'
+    },
     languages: ['English', 'French', 'Spanish'],
     hotelThemes: [
       { name: 'Champ de Mars Boutique Hotel', tier: 'Boutique Stay', basePrice: 8500, perks: ['Direct Eiffel Balcony View', 'Fresh Croissant Breakfast', 'Late Check-out'] },
@@ -333,6 +463,25 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'City of Lakes & Rajput Royalty',
     monthlyCheckins: 115000,
     highlight: 'Majestic marble palace complex towering over shimmering Lake Pichola',
+    catchyLine: 'White marble palaces float on shimmering blue lakes beneath the Mewar sun.',
+    bestPic: 'https://images.unsplash.com/photo-1615836245337-f5b9b2303f10?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Royal Greeting', translation: 'Khamma Ghani sa (खम्मा घणी सा)', pronunciation: 'Khum-mah Ghuh-nee sah', context: 'Traditional Mewari greeting' },
+      { phrase: 'When is the boat ride?', translation: 'Boat ride kab hai? (नाव की सवारी कब है?)', pronunciation: 'Boat ride kub high?', context: 'Sunset lake cruise' }
+    ],
+    foodMustEats: [
+      { name: 'Royal Laal Maas with Bajra Roti', spot: 'Tribute Restaurant (Fateh Sagar)', tip: 'Slow cooked mutton in Mathania fiery red chilies and yogurt.' },
+      { name: 'Butter Pav Bhaji & Falooda', spot: 'Sukhadia Circle Food Stalls', tip: 'Famous evening spot buzzing with street food carts.' }
+    ],
+    culturalTips: [
+      'Wear slip-on shoes for visiting City Palace temples and inner courtyards.',
+      'Sunset boat tickets sell out quickly; book prior to 04:30 PM at Rameshwar Ghat.'
+    ],
+    commuteTips: {
+      autoFare: '₹60-100 around old town; ₹150 to Sajjangarh Monsoon Palace.',
+      metroAvailable: false,
+      localAdvice: 'Old City lanes are narrow; walking and auto rickshaws are best.'
+    },
     languages: ['English', 'Hindi', 'Rajasthani'],
     hotelThemes: [
       { name: 'Pichola Lakefront Haveli', tier: 'Heritage Luxury', basePrice: 5200, perks: ['Private Sunset Boat Ride', 'Rooftop Palace View', 'Royal Rajasthani Thali'] },
@@ -362,6 +511,26 @@ export const GLOBAL_DESTINATIONS: Record<string, {
     category: 'Sacred Sikh Shrine & Spiritual Haven',
     monthlyCheckins: 195000,
     highlight: 'Dazzling gilded gurdwara surrounded by the sacred Amrit Sarovar pool of nectar',
+    catchyLine: 'Golden reflections shimmer upon the sacred nectar pool in timeless peace and community love.',
+    bestPic: 'https://images.unsplash.com/photo-1595846519845-68e298c2edd8?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Universal Greeting', translation: 'Sat Sri Akaal (ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ)', pronunciation: 'Sut Sree Uh-kahl', context: 'Revered Sikh greeting' },
+      { phrase: 'Where is Langar Hall?', translation: 'Langar hall kithe hai? (ਲੰਗਰ ਹਾਲ ਕਿੱਥੇ ਹੈ?)', pronunciation: 'Lung-uhr hahl kith-ay high?', context: 'Community kitchen navigation' },
+      { phrase: 'Thank you kindly', translation: 'Dhanvaad ji (ਧੰਨਵਾਦ ਜੀ)', pronunciation: 'Dhun-vahd jee', context: 'Warm gratitude' }
+    ],
+    foodMustEats: [
+      { name: 'Crisp Amritsari Aloo Kulcha with Chole', spot: 'Bhai Kulwant Singh Kulchian Wale', tip: 'Baked in clay tandoors and drenched in fresh desi ghee.' },
+      { name: 'Creamy Malai Pista Lassi', spot: 'Ahuja Milk Bhandar (Dhab Khatikan)', tip: 'Thick, sweet curd lassi served in traditional tall glasses.' }
+    ],
+    culturalTips: [
+      'Head coverings are mandatory within the entire temple complex; free scarves provided at gates.',
+      'Walk through the cleansing water foot-bath before stepping onto the sacred marble.'
+    ],
+    commuteTips: {
+      autoFare: 'Free SGPC Golden Temple electric buses from Amritsar Railway Station; autos ₹50-80.',
+      metroAvailable: false,
+      localAdvice: 'Heritage Street is totally pedestrianized with lovely night illumination.'
+    },
     languages: ['English', 'Punjabi', 'Hindi'],
     hotelThemes: [
       { name: 'The Golden Heritage Suites', tier: 'Heritage Luxury', basePrice: 3600, perks: ['Heritage Street Walk Escort', 'Langar Experience Pass', 'Complimentary Breakfast'] },
@@ -486,7 +655,13 @@ export function resolveDestinationAndInventory(
         googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.name} ${data.city}`)}`,
         monthlyCheckins: data.monthlyCheckins,
         checkinTrend: 'high',
-        bestTimeToVisit: 'Best during early morning or sunset hours'
+        bestTimeToVisit: 'Best during early morning or sunset hours',
+        catchyLine: data.catchyLine || data.highlight,
+        bestPic: data.bestPic || 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1400&q=85',
+        survivalPhrases: data.survivalPhrases,
+        foodMustEats: data.foodMustEats,
+        culturalTips: data.culturalTips,
+        commuteTips: data.commuteTips
       };
 
       // Generate verified hotels within 5km radius with realistic bearings
@@ -603,7 +778,27 @@ export function resolveDestinationAndInventory(
     googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(titleCased)}`,
     monthlyCheckins: 85000,
     checkinTrend: 'high',
-    bestTimeToVisit: 'Morning hours for lower check-in density'
+    bestTimeToVisit: 'Morning hours for lower check-in density',
+    catchyLine: `Immerse in the breathtaking beauty, historic wonders, and vibrant streets of ${titleCased}.`,
+    bestPic: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello / Welcome', translation: 'Namaste / Hello', pronunciation: 'Nah-mas-tay', context: 'Universal polite greeting' },
+      { phrase: 'How much is this?', translation: 'Kitna hua? / How much is it?', pronunciation: 'Kit-nah hoo-ah?', context: 'Bazaar bargaining' },
+      { phrase: 'Where is the main gate?', translation: 'Mukhya dwar kahan hai?', pronunciation: 'Mookh-yah dvahr kah-hahn high?', context: 'Navigating monument gates' },
+      { phrase: 'Thank you very much!', translation: 'Bahut dhanyawad / Shukriya', pronunciation: 'Buh-hoot dhun-yah-vahd', context: 'Warm gratitude' }
+    ],
+    foodMustEats: [
+      { name: 'Specialty Local Thali & Street Delicacies', spot: `${titleCased} Old Market Bazaar`, tip: 'Follow the crowd of local families for the freshest dishes.' }
+    ],
+    culturalTips: [
+      'Carry modest clothing covering shoulders and knees when visiting sacred monuments.',
+      'Keep small cash notes handy for local vendors, shoe-minders, and rickshaws.'
+    ],
+    commuteTips: {
+      autoFare: '₹80-150 for typical 3-5 km transit across town.',
+      metroAvailable: true,
+      localAdvice: 'Always confirm the fare beforehand or use app-based ride hailing for guaranteed rates.'
+    }
   };
 
   const genericHotels: Hotel[] = [
