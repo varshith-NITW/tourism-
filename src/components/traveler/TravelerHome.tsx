@@ -129,6 +129,53 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
         </div>
       </div>
 
+      {/* Suggested 2-Day Cultural Itinerary (Positioned directly under AI Prompt Section) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-base text-slate-900">
+                AI-Synthesized Schedule around {currentSpot.name}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Customized daily schedule synchronized with monument opening hours and low footfall traffic windows.
+              </p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full">
+            <Sparkles className="w-3.5 h-3.5" />
+            AI Itinerary Plan
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {aiResult.customItinerary.map((item) => (
+            <div key={item.day} className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2.5">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                <span className="text-xs font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/60 px-2 py-0.5 rounded-md">
+                  Day {item.day}
+                </span>
+                <span className="text-xs font-bold text-slate-900">{item.title}</span>
+              </div>
+              <ul className="space-y-1.5 text-xs text-slate-700 mt-2">
+                {item.activities.map((act, aIdx) => (
+                  <li key={aIdx} className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold mt-0.5">•</span>
+                    <span>{act}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
+                💡 Local Tip: {item.localTip}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Target Landmark Tabs & Google Check-In Footfall Bar */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -399,40 +446,6 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Suggested 2-Day Cultural Itinerary */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-indigo-600" />
-          <h3 className="font-bold text-base text-slate-900">
-            AI-Synthesized Schedule around {currentSpot.name}
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {aiResult.customItinerary.map((item) => (
-            <div key={item.day} className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-                  Day {item.day}
-                </span>
-                <span className="text-xs font-semibold text-slate-900">{item.title}</span>
-              </div>
-              <ul className="space-y-1.5 text-xs text-slate-600 mt-2">
-                {item.activities.map((act, aIdx) => (
-                  <li key={aIdx} className="flex items-start gap-1.5">
-                    <span className="text-emerald-600 font-bold">•</span>
-                    <span>{act}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
-                💡 Local Tip: {item.localTip}
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
