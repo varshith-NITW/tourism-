@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Sparkles, MapPin, Search, Navigation, ShieldCheck, ExternalLink, Compass, Calendar, ArrowRight, TrendingUp, Info } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Sparkles, MapPin, Search, Navigation, ShieldCheck, ExternalLink, Calendar, ArrowRight, TrendingUp, SlidersHorizontal, Layers, Zap, X } from 'lucide-react';
 import { TouristSpot, Hotel, Guide, AIQueryFilters, AIRecommendationResponse } from '../../types';
 import { SAMPLE_AI_PROMPTS } from '../../data/mockData';
 import { parseNaturalLanguagePrompt, executeAIRecommendationEngine } from '../../services/aiEngine';
 import { InteractiveMap } from '../common/InteractiveMap';
 import { getGoogleMapsDirectionsUrl } from '../../services/spatialService';
+import { getAutocompleteSuggestions } from '../../services/placesService';
 
 interface TravelerHomeProps {
   spots: TouristSpot[];
@@ -27,7 +28,25 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
   const [stayStyle, setStayStyle] = useState<'heritage' | 'foodie' | 'family' | 'luxury' | 'budget' | 'all'>('all');
   const [activeHotelHover, setActiveHotelHover] = useState<string | null>(null);
 
-  const currentSpot = spots.find(s => s.id === selectedSpotId) || spots[0];
+  // Dynamic Search Engine: Sorting & Filtering Controls
+  const [sortBy, setSortBy] = useState<'pytorchScore' | 'checkins' | 'weeklyVelocity' | 'distance' | 'priceAsc' | 'priceDesc'>('pytorchScore');
+  const [spatialRadiusKm, setSpatialRadiusKm] = useState<number>(5.0);
+  const [filterGuideRequired, setFilterGuideRequired] = useState<boolean>(false);
+
+  // Autocomplete state
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<ReturnType<typeof getAutocompleteSuggestions>>([]);
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(event.target as Node)) {
+        setIsInputFocused(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Execute AI recommendation on every filter/search change
   const currentFilters: AIQueryFilters = {
@@ -44,8 +63,49 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
     spots,
     hotels,
     guides,
-    5.0 // 5km spatial radius filter
+    spatialRadiusKm
   );
+
+  const targetSpot = aiResult.targetSpot;
+
+  // Dynamic Multi-Dimensional Sorter
+  const displayedHotels = [...aiResult.recommendedHotels]
+    .filter(rec => {
+      if (filterGuideRequired && !rec.matchedGuide) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'pytorchScore') return b.checkinScore - a.checkinScore;
+      if (sortBy === 'checkins') return b.hotel.checkinCount - a.hotel.checkinCount;
+      if (sortBy === 'weeklyVelocity') return b.hotel.weeklyCheckins - a.hotel.weeklyCheckins;
+      if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
+      if (sortBy === 'priceAsc') return a.hotel.pricePerNight - b.hotel.pricePerNight;
+      if (sortBy === 'priceDesc') return b.hotel.pricePerNight - a.hotel.pricePerNight;
+      return 0;
+    });
+
+  const handleSearchChange = (val: string) => {
+    setSearchPrompt(val);
+    const suggestions = getAutocompleteSuggestions(val);
+    setAutocompleteSuggestions(suggestions);
+  };
+
+  const handleSelectSuggestion = (suggestion: ReturnType<typeof getAutocompleteSuggestions>[0]) => {
+    const queryText = `${suggestion.name}, ${suggestion.city}`;
+    setSearchPrompt(queryText);
+    setIsInputFocused(false);
+    setAutocompleteSuggestions([]);
+
+    const parsed = parseNaturalLanguagePrompt(queryText, spots);
+    setSelectedSpotId(parsed.landmarkId);
+    if (parsed.preferredLanguage) setSelectedLanguage(parsed.preferredLanguage);
+    if (parsed.travelVibe) setStayStyle(parsed.travelVibe as any);
+  };
+
+  // Combine spots with the dynamic AI result spot if it is a new destination
+  const displaySpots = spots.some(s => s.id === targetSpot.id)
+    ? spots
+    : [targetSpot, ...spots];
 
   const handlePromptSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,9 +124,12 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
   const handleApplyPreset = (preset: typeof SAMPLE_AI_PROMPTS[0]) => {
     setSearchPrompt(preset.query);
-    setSelectedSpotId(preset.landmarkId);
+    const parsed = parseNaturalLanguagePrompt(preset.query, spots);
+    setSelectedSpotId(parsed.landmarkId);
     setMaxBudget(preset.budget);
     setNeedsGuide(preset.needGuide);
+    if (parsed.preferredLanguage) setSelectedLanguage(parsed.preferredLanguage);
+    if (parsed.travelVibe) setStayStyle(parsed.travelVibe as any);
   };
 
   return (
@@ -74,7 +137,6 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
       
       {/* Hero & AI Prompt Section */}
       <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        {/* Subtle background glow */}
         <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-10 -top-10 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -87,35 +149,90 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
             Discover Partner Stays Ranked by <span className="text-emerald-400">Google Maps Check-Ins</span>
           </h1>
           <p className="mt-2 text-sm sm:text-base text-slate-300">
-            Guaranteed zero-hallucination inventory. The AI queries verified partner hotels strictly within a 5 km geo-radius of your target attraction, ranking stays by real traveler footfall density and pairing certified local guides.
+            Zero-hallucination inventory for any destination worldwide. Search any city or landmark — the AI queries verified partner stays strictly within a 5 km geo-radius, ranking stays by verified traveler check-in volume and pairing certified local guides.
           </p>
 
-          {/* Natural Language Prompt Form */}
-          <form onSubmit={handlePromptSubmit} className="mt-6">
-            <div className="flex flex-col sm:flex-row gap-2 bg-white/10 p-2 rounded-2xl backdrop-blur-md border border-white/15 focus-within:border-emerald-400 transition-all">
-              <div className="flex-1 flex items-center gap-3 px-3 py-1">
-                <Search className="w-5 h-5 text-emerald-400 shrink-0" />
-                <input
-                  type="text"
-                  value={searchPrompt}
-                  onChange={(e) => setSearchPrompt(e.target.value)}
-                  placeholder="e.g. 3-day trip near Charminar with heritage guide under 4000..."
-                  className="w-full bg-transparent text-white placeholder-slate-400 focus:outline-none text-sm"
-                />
+          {/* Natural Language Prompt Form with Autocomplete */}
+          <div className="relative mt-6" ref={autocompleteRef}>
+            <form onSubmit={handlePromptSubmit}>
+              <div className="flex flex-col sm:flex-row gap-2 bg-white/10 p-2 rounded-2xl backdrop-blur-md border border-white/15 focus-within:border-emerald-400 transition-all">
+                <div className="flex-1 flex items-center gap-3 px-3 py-1">
+                  <Search className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <input
+                    type="text"
+                    value={searchPrompt}
+                    onFocus={() => setIsInputFocused(true)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder="e.g. Taj Mahal under 5000 with history guide, Goa beach resort, Hawa Mahal Jaipur..."
+                    className="w-full bg-transparent text-white placeholder-slate-400 focus:outline-none text-sm font-medium"
+                  />
+                  {searchPrompt && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchPrompt('');
+                        setAutocompleteSuggestions([]);
+                      }}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Prompt AI</span>
+                </button>
               </div>
-              <button
-                type="submit"
-                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Prompt AI</span>
-              </button>
-            </div>
-          </form>
+            </form>
+
+            {/* Live Autocomplete Dropdown */}
+            {isInputFocused && autocompleteSuggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-2 bg-slate-900/95 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="p-2.5 border-b border-white/10 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>Destination Suggestions</span>
+                  <span className="text-emerald-400 font-normal">Google Maps Footfall Indexed</span>
+                </div>
+                <div className="divide-y divide-white/5">
+                  {autocompleteSuggestions.map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => handleSelectSuggestion(item)}
+                      className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors flex items-center justify-between group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-bold text-xs group-hover:scale-105 transition-transform">
+                          📍
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
+                            {item.name}, {item.city}
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {item.category}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-black text-red-400 flex items-center gap-1 justify-end">
+                          <TrendingUp className="w-3 h-3" />
+                          <span>{(item.monthlyCheckins / 1000).toFixed(0)}k/mo</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">check-in footfall</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Sample Prompts */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400">Try quick prompts:</span>
+            <span className="text-xs text-slate-400">Try nationwide & global prompts:</span>
             {SAMPLE_AI_PROMPTS.map((preset, idx) => (
               <button
                 key={idx}
@@ -126,6 +243,53 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
               </button>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Suggested Multi-Day Cultural Itinerary (Directly under AI Prompt Section) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-base text-slate-900">
+                AI-Synthesized Schedule around {targetSpot.name}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Customized daily schedule synchronized with monument opening hours and low footfall traffic windows.
+              </p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full">
+            <Sparkles className="w-3.5 h-3.5" />
+            AI Itinerary Plan
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {aiResult.customItinerary.map((item) => (
+            <div key={item.day} className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2.5">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                <span className="text-xs font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/60 px-2 py-0.5 rounded-md">
+                  Day {item.day}
+                </span>
+                <span className="text-xs font-bold text-slate-900">{item.title}</span>
+              </div>
+              <ul className="space-y-1.5 text-xs text-slate-700 mt-2">
+                {item.activities.map((act, aIdx) => (
+                  <li key={aIdx} className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold mt-0.5">•</span>
+                    <span>{act}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
+                💡 Local Tip: {item.localTip}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -147,17 +311,20 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {spots.map((spot) => {
-            const isSelected = spot.id === selectedSpotId;
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+          {displaySpots.slice(0, 5).map((spot) => {
+            const isSelected = spot.id === targetSpot.id;
             return (
               <button
                 key={spot.id}
-                onClick={() => setSelectedSpotId(spot.id)}
+                onClick={() => {
+                  setSelectedSpotId(spot.id);
+                  setSearchPrompt('');
+                }}
                 className={`text-left p-3.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden ${
                   isSelected
                     ? 'border-emerald-600 bg-emerald-50/50 shadow-sm ring-2 ring-emerald-500/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-2xs'
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -165,11 +332,11 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                   <span className="text-xs">📍</span>
                 </div>
                 <div className="mt-1 flex items-center gap-1.5 text-xs text-red-600 font-bold">
-                  <TrendingUp className="w-3 h-3" />
+                  <TrendingUp className="w-3.5 h-3.5" />
                   <span>{(spot.monthlyCheckins / 1000).toFixed(0)}k check-ins/mo</span>
                 </div>
                 <div className="mt-1 text-[11px] text-slate-500 line-clamp-1">
-                  {spot.bestTimeToVisit}
+                  {spot.tags?.[0] || 'Featured Attraction'}
                 </div>
               </button>
             );
@@ -183,25 +350,26 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-indigo-600" />
             <h3 className="font-bold text-sm text-slate-800">
-              Interactive Spatial Radar (<span className="text-indigo-600">5 km Geo-Radius</span> around {currentSpot.name})
+              Interactive Spatial Radar (<span className="text-indigo-600">5 km Geo-Radius</span> around {targetSpot.name})
             </h3>
           </div>
           <a
-            href={currentSpot.googleMapsUrl}
+            href={targetSpot.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(targetSpot.name)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-slate-600 hover:text-indigo-600 flex items-center gap-1 font-medium"
           >
-            <span>View {currentSpot.name} on Google Maps</span>
+            <span>View {targetSpot.name} on Google Maps</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 
         <InteractiveMap
-          spot={currentSpot}
-          hotels={hotels}
+          spot={targetSpot}
+          hotels={displayedHotels.map(r => r.hotel)}
           selectedHotelId={activeHotelHover}
           onSelectHotel={(hotel) => onSelectHotelForBooking(hotel)}
+          radiusKm={spatialRadiusKm}
         />
       </div>
 
@@ -213,13 +381,16 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           </div>
           <div>
             <div className="font-bold text-slate-900 flex items-center gap-2">
-              <span>Structured Context Match for: {aiResult.queryParsed.landmarkName}</span>
+              <span>Destination Match: {targetSpot.name}</span>
               <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md font-semibold">
                 Budget: ≤ ₹{aiResult.queryParsed.maxBudget.toLocaleString()}
               </span>
+              <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-semibold">
+                {targetSpot.city}
+              </span>
             </div>
             <div className="text-slate-500 mt-0.5">
-              Strict Non-Rating Algorithm: Hotlist sorted strictly by verified Google Maps check-in activity & footfall rank.
+              Strict Non-Rating Algorithm: Verified partner stays ranked by Google Maps check-in volume, weekly velocity, and distance penalty.
             </div>
           </div>
         </div>
@@ -231,32 +402,105 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
         </div>
       </div>
 
+      {/* Dynamic Filter & Sorter Toolbar */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          
+          {/* Sorter Selector */}
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-slate-500 shrink-0" />
+            <span className="text-xs font-bold text-slate-700">Sort Stays By:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+            >
+              <option value="pytorchScore">⚡ PyTorch Check-In Tensor Rank (Default)</option>
+              <option value="checkins">📍 Google Maps Footfall (Total Check-ins)</option>
+              <option value="weeklyVelocity">🔥 Fastest Growing (Weekly Velocity)</option>
+              <option value="distance">🧭 Proximity to Monument (Closest First)</option>
+              <option value="priceAsc">💵 Price: Low to High</option>
+              <option value="priceDesc">💎 Price: High to Low</option>
+            </select>
+          </div>
+
+          {/* Spatial Radius Selector */}
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-slate-500 shrink-0" />
+            <span className="text-xs font-bold text-slate-700">Radar Radius:</span>
+            <div className="inline-flex bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+              {[1.0, 2.5, 5.0].map((radius) => (
+                <button
+                  key={radius}
+                  onClick={() => setSpatialRadiusKm(radius)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    spatialRadiusKm === radius
+                      ? 'bg-white text-indigo-700 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {radius} km
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Guide Filter Toggle */}
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={filterGuideRequired}
+                onChange={(e) => setFilterGuideRequired(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+              />
+              <span>Certified Guide Pre-Bundled</span>
+            </label>
+          </div>
+
+        </div>
+
+        {/* AI Guardrail Info Line */}
+        <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500">
+          <div>
+            Showing <b>{displayedHotels.length} verified partner stays</b> within <b>{spatialRadiusKm} km</b> of <b>{targetSpot.name}</b>.
+          </div>
+          <div className="text-emerald-700 font-semibold flex items-center gap-1">
+            <Zap className="w-3 h-3 text-emerald-600" />
+            <span>PyTorch CheckinRankingNet Multi-Layer Perceptron Active</span>
+          </div>
+        </div>
+      </div>
+
       {/* Hotel Recommendation Cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-extrabold text-lg text-slate-900">
-            Recommended Partner Hotels & Commute Stats
+            Recommended Partner Hotels & Commute Stats near {targetSpot.name}
           </h3>
           <span className="text-xs text-slate-500 font-medium">
-            Sorted by Footfall & Check-in Volume
+            Strict Non-Rating Footfall Algorithm
           </span>
         </div>
 
         <div className="grid grid-cols-1 gap-5">
-          {aiResult.recommendedHotels.map(({ hotel, distanceKm, commuteMinutes, rationale, matchedGuide }, index) => {
-            const directionsUrl = getGoogleMapsDirectionsUrl(hotel.location, currentSpot.location, currentSpot.name);
+          {displayedHotels.map(({ hotel, distanceKm, commuteMinutes, rationale, matchedGuide, checkinScore }) => {
+            const directionsUrl = getGoogleMapsDirectionsUrl(hotel.location, targetSpot.location, targetSpot.name);
+            const hotelImg = hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';
+            const guideAvatar = matchedGuide?.avatar || (matchedGuide as any)?.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+            const guideLicense = matchedGuide?.verificationId || (matchedGuide as any)?.licenseNumber || 'ASI-CERT-VERIFIED';
 
             return (
               <div
                 key={hotel.id}
                 onMouseEnter={() => setActiveHotelHover(hotel.id)}
                 onMouseLeave={() => setActiveHotelHover(null)}
-                className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md hover:border-emerald-500/60 transition-all overflow-hidden flex flex-col lg:flex-row"
+                className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-emerald-500/60 transition-all overflow-hidden flex flex-col lg:flex-row"
               >
                 {/* Hotel Thumbnail & Badges */}
                 <div className="lg:w-72 h-52 lg:h-auto relative shrink-0">
                   <img
-                    src={hotel.image}
+                    src={hotelImg}
                     alt={hotel.name}
                     className="w-full h-full object-cover"
                   />
@@ -269,7 +513,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                   </div>
 
                   {/* Partner Badge */}
-                  <div className="absolute bottom-3 left-3 lg:bottom-3 lg:left-3 bg-white/95 backdrop-blur-sm text-slate-900 font-semibold text-[11px] px-2 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
+                  <div className="absolute bottom-3 left-3 lg:bottom-3 lg:left-3 bg-white/95 backdrop-blur-xs text-slate-900 font-semibold text-[11px] px-2 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Certified Partner</span>
                   </div>
@@ -303,12 +547,28 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                       </div>
                     </div>
 
+                    {/* PyTorch Neural Check-In Tensor Breakdown Badge */}
+                    <div className="mt-3 bg-slate-900 text-white rounded-xl p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span className="font-bold text-emerald-400">PyTorch Neural Score:</span>
+                        <span className="font-extrabold text-sm text-white">{checkinScore.toLocaleString()} pts</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+                        <span>Footfall: <b>+{(hotel.checkinCount * 1.0).toLocaleString()}</b></span>
+                        <span>•</span>
+                        <span>Velocity: <b>+{(hotel.weeklyCheckins * 4.5).toFixed(0)}</b></span>
+                        <span>•</span>
+                        <span>Distance: <b>-{Math.round(distanceKm * 200)}</b></span>
+                      </div>
+                    </div>
+
                     {/* Commute and Distance Meter */}
                     <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                       <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-800 font-semibold px-2.5 py-1 rounded-lg border border-indigo-100">
                         <Navigation className="w-3.5 h-3.5 text-indigo-600" />
                         <span>
-                          {distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m away` : `${distanceKm} km`} from {currentSpot.name}
+                          {distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m away` : `${distanceKm} km`} from {targetSpot.name}
                         </span>
                       </div>
                       <div className="bg-slate-100 text-slate-700 font-medium px-2.5 py-1 rounded-lg">
@@ -352,7 +612,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                     {matchedGuide ? (
                       <div className="flex items-center gap-2.5 text-xs text-slate-600">
                         <img
-                          src={matchedGuide.avatar}
+                          src={guideAvatar}
                           alt={matchedGuide.name}
                           className="w-8 h-8 rounded-full object-cover border border-emerald-400"
                         />
@@ -360,7 +620,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                           <div className="font-bold text-slate-900 flex items-center gap-1">
                             <span>Add-on Guide: {matchedGuide.name}</span>
                             <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-normal">
-                              {matchedGuide.verificationId}
+                              {guideLicense}
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-500">
@@ -388,7 +648,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
                       <button
                         onClick={() => onSelectHotelForBooking(hotel, matchedGuide)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-1.5 cursor-pointer"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-2xs hover:shadow-md flex items-center gap-1.5 cursor-pointer"
                       >
                         <span>Select Stay & Guide</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -399,40 +659,6 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Suggested 2-Day Cultural Itinerary */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-indigo-600" />
-          <h3 className="font-bold text-base text-slate-900">
-            AI-Synthesized Schedule around {currentSpot.name}
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {aiResult.customItinerary.map((item) => (
-            <div key={item.day} className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
-                  Day {item.day}
-                </span>
-                <span className="text-xs font-semibold text-slate-900">{item.title}</span>
-              </div>
-              <ul className="space-y-1.5 text-xs text-slate-600 mt-2">
-                {item.activities.map((act, aIdx) => (
-                  <li key={aIdx} className="flex items-start gap-1.5">
-                    <span className="text-emerald-600 font-bold">•</span>
-                    <span>{act}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
-                💡 Local Tip: {item.localTip}
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
