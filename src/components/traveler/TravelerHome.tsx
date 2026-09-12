@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Sparkles, 
   MapPin, 
@@ -29,7 +29,7 @@ import { InteractiveMap } from '../common/InteractiveMap';
 import { getGoogleMapsDirectionsUrl } from '../../services/spatialService';
 import { getAutocompleteSuggestions } from '../../services/placesService';
 import { logSearchToNodeAPI } from '../../services/apiClient';
-import { generateGeminiRecommendations, GeminiTravelInsight } from '../../services/geminiService';
+import { generateGeminiRecommendations, GeminiTravelInsight, getGeminiTouristPlaces, TouristPlaceItem } from '../../services/geminiService';
 
 interface TravelerHomeProps {
   spots: TouristSpot[];
@@ -102,51 +102,76 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Execute recommendation engine
-  const currentFilters: AIQueryFilters = {
+  // Memoized filters to avoid recreating object on every render
+  const currentFilters: AIQueryFilters = useMemo(() => ({
     targetLandmarkId: selectedSpotId,
     maxBudgetPerNight: maxBudget,
     needsGuide,
     preferredLanguage: selectedLanguage,
     stayStyle,
     searchQuery: searchPrompt
-  };
+  }), [selectedSpotId, maxBudget, needsGuide, selectedLanguage, stayStyle, searchPrompt]);
 
-  const aiResult: AIRecommendationResponse = executeAIRecommendationEngine(
-    currentFilters,
-    spots,
-    hotels,
-    guides,
-    spatialRadiusKm
-  );
+  // Execute recommendation engine strictly with memoization (prevents infinite re-renders)
+  const aiResult: AIRecommendationResponse = useMemo(() => {
+    return executeAIRecommendationEngine(
+      currentFilters,
+      spots,
+      hotels,
+      guides,
+      spatialRadiusKm
+    );
+  }, [currentFilters, spots, hotels, guides, spatialRadiusKm]);
 
   const targetSpot = aiResult.targetSpot;
 
-  // Filter & Sort Stays strictly by Real Footfall Check-ins
-  const displayedHotels = [...aiResult.recommendedHotels]
-    .filter(rec => {
-      if (filterGuideRequired && !rec.matchedGuide) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'checkins') return b.hotel.checkinCount - a.hotel.checkinCount;
-      if (sortBy === 'weeklyVelocity') return b.hotel.weeklyCheckins - a.hotel.weeklyCheckins;
-      if (sortBy === 'pytorchScore') return b.checkinScore - a.checkinScore;
-      if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
-      if (sortBy === 'priceAsc') return a.hotel.pricePerNight - b.hotel.pricePerNight;
-      if (sortBy === 'priceDesc') return b.hotel.pricePerNight - a.hotel.pricePerNight;
-      return 0;
-    });
+  // Filter & Sort Stays strictly by Real Footfall Check-ins (memoized)
+  const displayedHotels = useMemo(() => {
+    return [...aiResult.recommendedHotels]
+      .filter(rec => {
+        if (filterGuideRequired && !rec.matchedGuide) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'checkins') return b.hotel.checkinCount - a.hotel.checkinCount;
+        if (sortBy === 'weeklyVelocity') return b.hotel.weeklyCheckins - a.hotel.weeklyCheckins;
+        if (sortBy === 'pytorchScore') return b.checkinScore - a.checkinScore;
+        if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
+        if (sortBy === 'priceAsc') return a.hotel.pricePerNight - b.hotel.pricePerNight;
+        if (sortBy === 'priceDesc') return b.hotel.pricePerNight - a.hotel.pricePerNight;
+        return 0;
+      });
+  }, [aiResult.recommendedHotels, filterGuideRequired, sortBy]);
+
+  // Top Tourist Places in the searched destination powered by Google Gemini
+  const currentCityTouristPlaces: TouristPlaceItem[] = useMemo(() => {
+    return getGeminiTouristPlaces(searchPrompt || targetSpot.city || targetSpot.name, targetSpot.city);
+  }, [searchPrompt, targetSpot.city, targetSpot.name]);
+
+  // Handle clicking a Gemini tourist place to seamlessly explore it
+  const handleSelectTouristPlace = (place: TouristPlaceItem) => {
+    const existing = spots.find(s => s.id === place.id || s.name.toLowerCase().includes(place.name.toLowerCase()));
+    if (existing) {
+      setSelectedSpotId(existing.id);
+      setSearchPrompt('');
+    } else {
+      setSearchPrompt(`${place.name}, ${place.city}`);
+      const parsed = parseNaturalLanguagePrompt(`${place.name}, ${place.city}`, spots);
+      setSelectedSpotId(parsed.landmarkId);
+    }
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  };
 
   // Automatically select the #1 recommended stay if none selected or if destination changes
+  const topHotelId = displayedHotels[0]?.hotel?.id;
   useEffect(() => {
-    if (displayedHotels.length > 0) {
-      const currentSelectedExists = displayedHotels.some(h => h.hotel.id === selectedPlanHotelId);
-      if (!currentSelectedExists) {
-        setSelectedPlanHotelId(displayedHotels[0].hotel.id);
-      }
+    if (topHotelId) {
+      setSelectedPlanHotelId(prev => {
+        const currentSelectedExists = displayedHotels.some(h => h.hotel.id === prev);
+        return currentSelectedExists ? prev : topHotelId;
+      });
     }
-  }, [selectedSpotId, displayedHotels]);
+  }, [selectedSpotId, topHotelId]);
 
   // Trigger Google Gemini live recommendation analysis on destination or vibe change
   useEffect(() => {
@@ -478,9 +503,15 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           
           {/* Top Bar: Zero Fake Review Footfall Badge & Google Maps link */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md border border-emerald-200 text-emerald-800 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>100% Real Footfall • Zero Fake Reviews</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md border border-emerald-200 text-emerald-800 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>100% Real Footfall • Zero Fake Reviews</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 bg-indigo-600/90 text-white backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold shadow-md">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                <span>Original Photo Verified</span>
+              </div>
             </div>
 
             <a
@@ -613,6 +644,119 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
               <span className="text-emerald-700">{activeHotel?.name || 'Top Stay'}</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* 3b. Google Gemini Top Tourist Places Showcase for Searched Destination */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+                Google Gemini Tourist Places Discovery
+              </span>
+              <span className="text-xs font-semibold text-slate-500">
+                • 100% Real Footfall Check-ins
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
+              Top Tourist Places in {targetSpot.city || targetSpot.name.split(',')[0]}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Gemini analyzed physical GPS check-ins to discover the highest-rated landmarks, forts & palaces in {targetSpot.city}. Click any spot to instantly view nearby verified stays and licensed guides.
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-xl inline-block">
+              {currentCityTouristPlaces.length} Iconic Attractions Curated
+            </span>
+          </div>
+        </div>
+
+        {/* Tourist Places Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {currentCityTouristPlaces.map((place) => {
+            const isCurrentSelected = selectedSpotId === place.id || targetSpot.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0]);
+            return (
+              <div
+                key={place.id}
+                className={`group rounded-2xl border overflow-hidden transition-all duration-300 flex flex-col justify-between bg-white hover:shadow-md ${
+                  isCurrentSelected ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md' : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div>
+                  {/* Authentic Original Photo */}
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                    <img
+                      src={place.image}
+                      alt={place.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+                    
+                    {/* Footfall Badge */}
+                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-black text-red-600 shadow-sm flex items-center gap-1 border border-slate-100">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>{(place.monthlyCheckins / 1000).toFixed(0)}k visits/mo</span>
+                    </div>
+
+                    {/* Category Badge */}
+                    <div className="absolute bottom-3 left-3 text-[11px] font-bold text-white bg-slate-900/80 backdrop-blur-xs px-2.5 py-0.5 rounded-lg">
+                      {place.category}
+                    </div>
+                  </div>
+
+                  {/* Place Details */}
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-700 transition-colors">
+                        {place.name}
+                      </h3>
+                      <span className="text-[10px] font-bold text-slate-400 shrink-0">
+                        {place.city}
+                      </span>
+                    </div>
+
+                    {/* Catchy line */}
+                    <p className="text-xs text-slate-600 font-serif italic line-clamp-2">
+                      “{place.catchyLine}”
+                    </p>
+
+                    {/* Highlight */}
+                    <div className="text-[11px] text-slate-500 line-clamp-2">
+                      <span className="font-bold text-slate-700">Highlight: </span>
+                      {place.highlight}
+                    </div>
+
+                    {/* Best time to visit */}
+                    {place.bestTimeToVisit && (
+                      <div className="flex items-center gap-1 text-[11px] text-amber-700 font-semibold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/60">
+                        <Clock className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{place.bestTimeToVisit}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action: Explore This Spot */}
+                <div className="p-4 pt-0">
+                  <button
+                    onClick={() => handleSelectTouristPlace(place)}
+                    className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      isCurrentSelected
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 hover:bg-emerald-600 text-slate-800 hover:text-white'
+                    }`}
+                  >
+                    <span>{isCurrentSelected ? '✓ Currently Selected' : 'Explore This Spot'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

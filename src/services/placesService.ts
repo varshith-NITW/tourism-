@@ -22,6 +22,107 @@ export const GLOBAL_DESTINATIONS: Record<string, {
   guideProfiles: { name: string; title: string; specialties: string[]; languages: string[]; fee: number }[];
   itineraryDays: { title: string; activities: string[]; localTip: string }[];
 }> = {
+  'hyderabad': {
+    name: 'Charminar & Old City Bazaars',
+    city: 'Hyderabad',
+    country: 'India',
+    location: { lat: 17.3616, lng: 78.4747 },
+    category: 'Heritage Mosque & Royal Pearl Bazaars',
+    monthlyCheckins: 245000,
+    highlight: 'Iconic 16th-century grand mosque monument surrounded by bustling Laad Bazaar pearl and spice lanes',
+    catchyLine: '400 years of royal pearls & steaming Irani chai whisper through timeless bazaars.',
+    bestPic: 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello / Greetings', translation: 'Namaskaram (నమస్కారం) / Adab (آداب)', pronunciation: 'Nah-mas-kahr-am', context: 'Universal polite greeting' },
+      { phrase: 'Where is authentic Biryani?', translation: 'Manchi Biryani ekkada? (మంచి బిర్యానీ ఎక్కడ?)', pronunciation: 'Mun-chee bir-yah-nee ek-kuh-dah?', context: 'Food navigation' },
+      { phrase: 'How much is this?', translation: 'Idhi entha? (ఇది ఎంత?)', pronunciation: 'Ee-dhee en-thah?', context: 'Bazaar bargaining' },
+      { phrase: 'Thank you very much', translation: 'Chala Dhanyavadhalu (చాలా ధన్యవాదాలు)', pronunciation: 'Chah-lah dhun-yah-vah-dha-loo', context: 'Expressing gratitude' }
+    ],
+    foodMustEats: [
+      { name: 'Irani Chai & Osmania Biscuits', spot: 'Nimrah Cafe & Bakery (Opposite Charminar)', tip: 'Dip the warm salted biscuit into the rich cardamom milk tea.' },
+      { name: 'Kacche Gosht ki Hyderabadi Dum Biryani', spot: 'Hotel Shadab (Ghansi Bazaar)', tip: 'Served with fiery Mirchi ka Salan and Dahi Chutney.' }
+    ],
+    culturalTips: [
+      'Remove footwear at mosque monument steps and dress respectfully.',
+      'Bargaining is customary in Laad Bazaar; start at 60-70% of initial price.'
+    ],
+    commuteTips: {
+      autoFare: '₹60-100 within Old City; ₹200 from Secunderabad Station.',
+      metroAvailable: true,
+      localAdvice: 'Take the Metro to MGBS station, then hop on an electric rickshaw for ₹30.'
+    },
+    languages: ['English', 'Telugu', 'Hindi', 'Urdu'],
+    hotelThemes: [
+      { name: 'Hotel Royal Charminar Heritage', tier: 'Heritage Luxury', basePrice: 4200, perks: ['Direct Charminar View', 'Midnight Biryani Pass', 'Complimentary Chai'], image: 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Taj Falaknuma Palace Retreat', tier: 'Heritage Luxury', basePrice: 14500, perks: ['Horse-Drawn Carriage Entry', 'Nizam Royal Dining', 'Heritage Library Access'], image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'The Golconda acoustic Boutique Stay', tier: 'Boutique Stay', basePrice: 3200, perks: ['Fort Sunset Rooftop', 'Acoustic Tour Map', 'Courtyard Tea'], image: 'https://images.unsplash.com/photo-1606298855672-3efb620b7537?auto=format&fit=crop&w=1000&q=80' }
+    ],
+    guideProfiles: [
+      { name: 'Mirza Sikandar Baig', title: 'Nizam Era Historian & Asaf Jahi Heritage Curator', specialties: ['Nizam History', 'Qutb Shahi Architecture', 'Laad Bazaar Gemology'], languages: ['English', 'Urdu', 'Hindi', 'Telugu'], fee: 1600 },
+      { name: 'Sravani Varma', title: 'Old City Cultural & Culinary Walk Curator', specialties: ['Hyderabadi Biryani Trail', 'Irani Chai Walk', 'Chowmahalla Palace'], languages: ['English', 'Telugu', 'Hindi'], fee: 1400 }
+    ],
+    itineraryDays: [
+      {
+        title: 'Old City Bazaars & Nizam Palaces',
+        activities: [
+          '08:30 AM: Morning Irani Chai and Osmania biscuits at Nimrah Cafe overlooking Charminar',
+          '10:30 AM: Walk through the mirrored halls and vintage cars of Chowmahalla Palace',
+          '01:30 PM: Authentic Dum Biryani lunch at Hotel Shadab',
+          '04:30 PM: Sunset sound and light show at Golconda Fort'
+        ],
+        localTip: 'Visit Charminar before 09:00 AM for crowd-free photography.'
+      }
+    ]
+  },
+  'delhi': {
+    name: 'Qutub Minar & Historic Delhi',
+    city: 'Delhi',
+    country: 'India',
+    location: { lat: 28.5244, lng: 77.1855 },
+    category: 'UNESCO Afghan-Gothic Monument',
+    monthlyCheckins: 210000,
+    highlight: '73-meter soaring fluted red sandstone minaret and ancient 4th-century rust-resistant iron pillar',
+    catchyLine: '73 meters of red sandstone and marble tell stories of empires rising and falling.',
+    bestPic: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1400&q=85',
+    survivalPhrases: [
+      { phrase: 'Hello / Greetings', translation: 'Namaste (नमस्ते)', pronunciation: 'Nah-mas-tay', context: 'Warm polite greeting' },
+      { phrase: 'How far is the metro?', translation: 'Metro kitni door hai? (मेट्रो कितनी दूर है?)', pronunciation: 'Metro kit-nee door high?', context: 'Metro transit' },
+      { phrase: 'One plate Chaat please', translation: 'Ek plate Chaat dena (एक प्लेट चाट देना)', pronunciation: 'Ek plate chaat day-nah', context: 'Old Delhi street food' }
+    ],
+    foodMustEats: [
+      { name: 'Old Delhi Paranthe & Daulat ki Chaat', spot: 'Paranthe Wali Gali (Chandni Chowk)', tip: 'Crispy deep-fried stuffed flatbreads with spiced pumpkin and mint chutneys.' },
+      { name: 'Butter Chicken & Roomali Roti', spot: 'Moti Mahal (Daryaganj)', tip: 'The original inventor of creamy tandoori butter chicken.' }
+    ],
+    culturalTips: [
+      'Delhi Metro is the fastest and cleanest way to navigate between south and central monuments.',
+      'Wear slip-on shoes for temple and mosque visits (e.g. Jama Masjid).'
+    ],
+    commuteTips: {
+      autoFare: 'Autos must run on meter; Uber and Ola cabs are widely available 24/7.',
+      metroAvailable: true,
+      localAdvice: 'Yellow Line Metro connects Qutub Minar directly to Rajiv Chowk (Connaught Place).'
+    },
+    languages: ['English', 'Hindi', 'Punjabi', 'Urdu'],
+    hotelThemes: [
+      { name: 'Mehrauli Heritage Forest Suites', tier: 'Heritage Luxury', basePrice: 4600, perks: ['Direct Qutub Minar View', 'Archaeological Park Escort', 'Rooftop Lounge'], image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1000&q=80' },
+      { name: 'Lutyens Boutique City Inn', tier: 'Boutique Stay', basePrice: 3800, perks: ['Central Delhi Location', 'Metro Pass Included', 'Buffet Breakfast'], image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80' }
+    ],
+    guideProfiles: [
+      { name: 'Rajiv Malhotra', title: 'Delhi Sultanate & Mughal Architecture Scholar', specialties: ['Qutub Complex History', 'Mehrauli Archaeological Park', 'Old Delhi Food Trail'], languages: ['English', 'Hindi', 'Urdu'], fee: 1700 }
+    ],
+    itineraryDays: [
+      {
+        title: 'Delhi Sultanate Heritage & Mehrauli Trail',
+        activities: [
+          '08:30 AM: Morning walk through Qutub Complex and the ancient Iron Pillar',
+          '11:30 AM: Stepwells and ruined tombs of Mehrauli Archaeological Park',
+          '01:30 PM: Lunch at Olive Bar & Kitchen overlooking the Qutub Minar',
+          '05:00 PM: Sunset walk along India Gate and Kartavya Path'
+        ],
+        localTip: 'Visit Qutub Minar at morning 08:30 AM for golden sun hitting the fluted red sandstone.'
+      }
+    ]
+  },
   'taj mahal': {
     name: 'Taj Mahal',
     city: 'Agra',
@@ -622,14 +723,14 @@ export function resolveDestinationAndInventory(
         description: data.highlight,
         tags: [data.category, data.city, 'Heritage'],
         openingHours: '06:00 AM - 08:00 PM',
-        image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80',
+        image: data.bestPic || data.hotelThemes[0]?.image || 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1200&q=80',
         googlePlaceId: `ChIJ_${key.replace(/\s+/g, '_')}`,
         googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.name} ${data.city}`)}`,
         monthlyCheckins: data.monthlyCheckins,
         checkinTrend: 'high',
         bestTimeToVisit: 'Best during early morning or sunset hours',
         catchyLine: data.catchyLine || data.highlight,
-        bestPic: data.bestPic || 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1400&q=85',
+        bestPic: data.bestPic || data.hotelThemes[0]?.image || 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1400&q=85',
         survivalPhrases: data.survivalPhrases,
         foodMustEats: data.foodMustEats,
         culturalTips: data.culturalTips,
@@ -737,8 +838,10 @@ export function resolveDestinationAndInventory(
   const defaultLat = 28.6139;
   const defaultLng = 77.2090;
 
+  const safeSlug = titleCased.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
   const genericSpot: TouristSpot = {
-    id: `spot-custom-${Date.now()}`,
+    id: `spot-custom-${safeSlug}`,
     name: `${titleCased} Attraction`,
     city: titleCased,
     location: { lat: defaultLat, lng: defaultLng },
@@ -746,7 +849,7 @@ export function resolveDestinationAndInventory(
     tags: [titleCased, 'Featured Destination'],
     openingHours: '06:00 AM - 08:00 PM',
     image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
-    googlePlaceId: `ChIJ_gen_${Date.now()}`,
+    googlePlaceId: `ChIJ_gen_${safeSlug}`,
     googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(titleCased)}`,
     monthlyCheckins: 85000,
     checkinTrend: 'high',
