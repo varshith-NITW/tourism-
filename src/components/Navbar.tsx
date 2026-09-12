@@ -1,8 +1,8 @@
 import React from 'react';
-import { Compass, Hotel, Users, ShieldCheck, DollarSign, Sparkles, MapPin, Key } from 'lucide-react';
+import { Compass, Hotel, Users, ShieldCheck, DollarSign, Sparkles, MapPin, Key, Terminal } from 'lucide-react';
 import { getStoredApiKeys } from '../services/placesService';
 
-export type PersonaType = 'traveler' | 'hotel' | 'guide' | 'split';
+export type PersonaType = 'traveler' | 'hotel' | 'guide' | 'split' | 'apis';
 
 interface NavbarProps {
   currentPersona: PersonaType;
@@ -99,6 +99,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {bookingCount}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => onSelectPersona('apis')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                currentPersona === 'apis'
+                  ? 'bg-white text-indigo-700 shadow-xs border border-slate-200/60'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Terminal className="w-4 h-4 text-indigo-600" />
+              <span>⚡ API Hub</span>
             </button>
           </nav>
 

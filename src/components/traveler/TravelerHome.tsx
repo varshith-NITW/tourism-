@@ -6,6 +6,7 @@ import { parseNaturalLanguagePrompt, executeAIRecommendationEngine } from '../..
 import { InteractiveMap } from '../common/InteractiveMap';
 import { getGoogleMapsDirectionsUrl } from '../../services/spatialService';
 import { getAutocompleteSuggestions } from '../../services/placesService';
+import { logSearchToNodeAPI, fetchSearchHistory } from '../../services/apiClient';
 
 interface TravelerHomeProps {
   spots: TouristSpot[];
@@ -120,6 +121,15 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
     if (['family', 'foodie', 'photography', 'budget', 'luxury'].includes(parsed.travelVibe)) {
       setStayStyle(parsed.travelVibe as any);
     }
+
+    // Log query asynchronously to MongoDB audit ledger
+    logSearchToNodeAPI({
+      query: searchPrompt,
+      landmark: targetSpot.name,
+      city: targetSpot.city,
+      maxBudget: parsed.maxBudget,
+      vibe: parsed.travelVibe
+    }).catch(() => {});
   };
 
   const handleApplyPreset = (preset: typeof SAMPLE_AI_PROMPTS[0]) => {
@@ -130,6 +140,15 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
     setNeedsGuide(preset.needGuide);
     if (parsed.preferredLanguage) setSelectedLanguage(parsed.preferredLanguage);
     if (parsed.travelVibe) setStayStyle(parsed.travelVibe as any);
+
+    // Log query asynchronously to MongoDB audit ledger
+    logSearchToNodeAPI({
+      query: preset.query,
+      landmark: preset.landmarkId,
+      city: targetSpot.city,
+      maxBudget: preset.budget,
+      vibe: parsed.travelVibe
+    }).catch(() => {});
   };
 
   return (

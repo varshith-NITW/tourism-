@@ -10,6 +10,8 @@ import { LocalGuidePortal } from './components/guide/LocalGuidePortal';
 import { SplitPaymentSimulator } from './components/split/SplitPaymentSimulator';
 import { calculateSplitBreakdown } from './services/paymentSplitService';
 import { ApiSettingsModal } from './components/common/ApiSettingsModal';
+import { ApiHubConsole } from './components/system/ApiHubConsole';
+import { createBookingViaNodeAPI } from './services/apiClient';
 
 export function App() {
   const [currentPersona, setCurrentPersona] = useState<PersonaType>('traveler');
@@ -85,6 +87,17 @@ export function App() {
 
   const handleBookingConfirmed = (newBooking: Booking) => {
     setBookings((prev) => [newBooking, ...prev]);
+    // Asynchronously synchronize booking record with backend Node.js API Gateway
+    createBookingViaNodeAPI({
+      hotelId: newBooking.hotelId,
+      hotelName: newBooking.hotelName,
+      roomName: newBooking.roomTypeName,
+      nights: newBooking.dates.nights,
+      roomPrice: newBooking.totalAmount,
+      guideId: newBooking.guideId,
+      guideName: newBooking.guideName,
+      guidePackageTitle: newBooking.guidePackageTitle
+    }).catch((err) => console.info('Booking API background sync:', err.message));
   };
 
   const handleRegisterNewHotel = (newHotel: Hotel) => {
@@ -139,6 +152,10 @@ export function App() {
 
         {currentPersona === 'split' && (
           <SplitPaymentSimulator />
+        )}
+
+        {currentPersona === 'apis' && (
+          <ApiHubConsole />
         )}
 
       </main>
