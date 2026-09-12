@@ -380,6 +380,88 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
   return (
     <div className="space-y-8 pb-20 text-slate-800">
 
+            {/* 4-Step User Journey Guide: AI Lookup -> Stays & Guides -> Direct Discount -> Razorpay Payment */}
+      <div className="bg-gradient-to-r from-emerald-50 via-indigo-50 to-blue-50 rounded-3xl p-5 sm:p-6 border border-emerald-200 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+            <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+              How TourMatch Works: 4 Simple Steps to Lock In Your Trip
+            </span>
+          </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="bg-emerald-600 text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-xs">
+              🏷️ Up to 20% Direct Website Discount
+            </span>
+            <span className="bg-blue-600 text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-xs">
+              💳 Razorpay Powered
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {/* Step 1 */}
+          <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              1
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                <span>🤖 AI Tourist Place Lookup</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                Gemini looks up top preferred destinations ranked strictly by <b>Google Maps Check-Ins</b> (Zero fake reviews).
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              2
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                <span>🏨 Best Stays & 🧭 Guides</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                Suggested properties & certified guides matched purely by <b>real footfall, never star ratings</b>.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              3
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                <span>🏷️ Direct Website Discount</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                Book on our website to get <b>15% OFF Stays</b> or <b>20% OFF Stays + Guide Bundle</b> automatically!
+              </p>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-xs flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              4
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                <span>💳 Razorpay Checkout</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                Instant secure checkout with <b>Razorpay UPI, QR, Cards & NetBanking</b> and split settlement.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 1. Minimalist Search & Destination Quick Selector */}
       <div className="space-y-3">
         
@@ -990,42 +1072,52 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3">
-                      <div>
-                        <span className="text-xs text-slate-400">From </span>
-                        <span className="text-xl font-black text-slate-900">
-                          ₹{hotel.pricePerNight.toLocaleString()}
-                        </span>
-                        <span className="text-xs text-slate-500"> / night</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between sm:justify-end gap-3">
+                      <div className="text-left sm:text-right">
+                        <div className="flex items-baseline gap-1.5 sm:justify-end">
+                          <span className="line-through text-slate-400 text-xs font-semibold">
+                            ₹{hotel.pricePerNight.toLocaleString()}
+                          </span>
+                          <span className="text-xl sm:text-2xl font-black text-emerald-700">
+                            ₹{Math.round(hotel.pricePerNight * 0.85).toLocaleString()}
+                          </span>
+                          <span className="text-xs text-slate-500"> / night</span>
+                        </div>
+                        <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md inline-block mt-0.5">
+                          🏷️ 15% Direct Website Discount
+                        </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedPlanHotelId(hotel.id);
-                          scrollToSmartBlocks();
-                        }}
-                        className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                          isSelectedPlan
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                        }`}
-                      >
-                        {isSelectedPlan ? <Check className="w-3.5 h-3.5" /> : null}
-                        <span>{isSelectedPlan ? 'Active Plan' : 'Select Experience'}</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPlanHotelId(hotel.id);
+                            scrollToSmartBlocks();
+                          }}
+                          className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+                            isSelectedPlan
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                          }`}
+                        >
+                          {isSelectedPlan ? <Check className="w-3.5 h-3.5" /> : null}
+                          <span>{isSelectedPlan ? 'Active Plan' : 'Explore'}</span>
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectHotelForBooking(hotel, matchedGuide);
-                        }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
-                      >
-                        <span>Book ⚡</span>
-                      </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectHotelForBooking(hotel, matchedGuide);
+                          }}
+                          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-600/20 flex items-center gap-1.5 cursor-pointer shrink-0"
+                        >
+                          <span>Book via Razorpay 💳</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -1058,9 +1150,9 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
             <button
               onClick={() => onSelectHotelForBooking(activeHotel, activeGuide)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-3 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer shrink-0 self-start sm:self-auto"
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black px-6 py-3 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-600/25 cursor-pointer shrink-0 self-start sm:self-auto"
             >
-              <span>Lock In My Experience</span>
+              <span>Book with Discount via Razorpay 💳</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

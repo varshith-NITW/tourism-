@@ -99,10 +99,15 @@ export interface HotelGuidePartnership {
 
 export interface SplitBreakdown {
   totalCharged: number;
+  originalTotal?: number;
+  websiteDiscountPercent?: number;
+  websiteDiscountAmount?: number;
   hotelGross: number;
+  hotelGrossOriginal?: number;
   hotelPlatformCut: number;
   hotelNet: number;
   guideGross: number;
+  guideGrossOriginal?: number;
   guidePlatformCut: number;
   hotelReferralKickback: number;
   hotelGuideReferral?: number;
@@ -128,6 +133,11 @@ export interface Booking {
   guidePackageType: GuidePackageType | null;
   guidePackageTitle: string | null;
   totalAmount: number;
+  originalAmount?: number;
+  websiteDiscountAmount?: number;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  paymentMethod?: string;
   splitBreakdown: SplitBreakdown;
   status: 'confirmed' | 'pending';
   createdAt: string;

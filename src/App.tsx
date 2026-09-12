@@ -93,7 +93,10 @@ export function App() {
       roomPrice: newBooking.totalAmount,
       guideId: newBooking.guideId,
       guideName: newBooking.guideName,
-      guidePackageTitle: newBooking.guidePackageTitle
+      guidePackageTitle: newBooking.guidePackageTitle,
+      razorpayPaymentId: newBooking.razorpayPaymentId,
+      razorpayOrderId: newBooking.razorpayOrderId,
+      websiteDiscountAmount: newBooking.websiteDiscountAmount
     }).catch((err) => console.info('Booking API background sync:', err.message));
   };
 

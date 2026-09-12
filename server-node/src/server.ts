@@ -145,7 +145,7 @@ app.post('/api/bookings/split-calculate', (req: Request, res: Response) => {
 
 // 4. Create Booking and Settle Split
 app.post('/api/bookings/create', async (req: Request, res: Response) => {
-  const { hotelId, hotelName, roomName, nights, roomPrice, guideId, guideName, guideFee, guidePackageTitle } = req.body;
+  const { hotelId, hotelName, roomName, nights, roomPrice, guideId, guideName, guideFee, guidePackageTitle, razorpayPaymentId, razorpayOrderId, websiteDiscountAmount } = req.body;
 
   const split = calculateMultiPartySplit({
     roomPrice: Number(roomPrice) || 3200,
@@ -166,6 +166,10 @@ app.post('/api/bookings/create', async (req: Request, res: Response) => {
     guideId: guideId || null,
     guideName: guideName || null,
     guidePackageTitle: guidePackageTitle || null,
+    razorpayPaymentId: razorpayPaymentId || `pay_RPZ_${Date.now().toString().slice(-8)}`,
+    razorpayOrderId: razorpayOrderId || `order_RPZ_${Date.now().toString().slice(-8)}`,
+    websiteDiscountAmount: websiteDiscountAmount || 0,
+    paymentMethod: 'Razorpay (UPI / Card / NetBanking)',
     totalCharged: split.totalCharged,
     splitBreakdown: split,
     status: 'confirmed',

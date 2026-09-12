@@ -312,21 +312,25 @@ export const GuideAddonModal: React.FC<GuideAddonModalProps> = ({
 
         </div>
 
-        {/* Modal Footer with Live Price & Checkout CTA */}
+        {/* Modal Footer with Live Price, Direct Discount & Razorpay Checkout CTA */}
         <div className="bg-slate-50 border-t border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="text-xs text-slate-500">
-              Total Package ({nights} night{nights > 1 ? 's' : ''} {includeGuide ? '+ Local Guide Bundle' : 'only'})
+              Total Package ({nights} night{nights > 1 ? 's' : ''} {includeGuide ? '+ Local Guide Bundle' : 'stay'})
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-black text-slate-900">
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <span className="line-through text-slate-400 text-sm font-semibold">
                 ₹{grandTotal.toLocaleString()}
               </span>
-              {includeGuide && (
-                <span className="text-xs text-emerald-700 font-semibold">
-                  (Includes ₹{currentPackagePrice.toLocaleString()} guide fee)
-                </span>
-              )}
+              <span className="text-2xl font-black text-emerald-700">
+                ₹{Math.round(grandTotal * (includeGuide ? 0.80 : 0.85)).toLocaleString()}
+              </span>
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
+                {includeGuide ? '20% Bundle Discount' : '15% Direct Discount'}
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              You save ₹{Math.round(grandTotal * (includeGuide ? 0.20 : 0.15)).toLocaleString()} by booking on our website!
             </div>
           </div>
 
@@ -339,9 +343,9 @@ export const GuideAddonModal: React.FC<GuideAddonModalProps> = ({
             </button>
             <button
               onClick={handleContinue}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer"
             >
-              <span>Proceed to Unified Checkout</span>
+              <span>Proceed to Razorpay Checkout</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
