@@ -1,0 +1,66 @@
+{
+  "family": "tourmatch-microservices",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "containerDefinitions": [
+    {
+      "name": "backend-node-api",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/tourmatch-backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "PORT", "value": "5000" },
+        { "name": "POSTGRES_HOST", "value": "tourmatch-db.cluster-xyz.us-east-1.rds.amazonaws.com" },
+        { "name": "MONGO_URI", "value": "mongodb://docdb-cluster.us-east-1.docdb.amazonaws.com:27017/tourmatch_docs" },
+        { "name": "REDIS_HOST", "value": "tourmatch-redis.us-east-1.cache.amazonaws.com" },
+        { "name": "AI_SERVICE_URL", "value": "http://127.0.0.1:8000" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tourmatch-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    },
+    {
+      "name": "ai-service-fastapi",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/tourmatch-ai:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "PORT", "value": "8000" },
+        { "name": "REDIS_HOST", "value": "tourmatch-redis.us-east-1.cache.amazonaws.com" }
+      ],
+      "secrets": [
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:tourmatch/openai-api-key"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tourmatch-ai",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
