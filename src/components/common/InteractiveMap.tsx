@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { TouristSpot, Hotel } from '../../types';
 
@@ -20,6 +20,21 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const [mapStyle, setMapStyle] = useState<'street' | 'satellite' | 'osm'>('street');
+
+  // Tile layer URLs - 100% Free & Zero Watermark (No API keys required)
+  const getTileUrl = (style: 'street' | 'satellite' | 'osm') => {
+    switch (style) {
+      case 'satellite':
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      case 'osm':
+        return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+      case 'street':
+      default:
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
+    }
+  };
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -33,9 +48,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         attributionControl: false
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd'
+      // Default high-resolution street tiles with zero watermark
+      tileLayerRef.current = L.tileLayer(getTileUrl('street'), {
+        maxZoom: 19
       }).addTo(map);
 
       mapInstanceRef.current = map;
@@ -50,6 +65,23 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
     };
   }, []);
+
+  // Switch tile layer when user toggles mapStyle
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    if (tileLayerRef.current) {
+      mapInstanceRef.current.removeLayer(tileLayerRef.current);
+    }
+    tileLayerRef.current = L.tileLayer(getTileUrl(mapStyle), {
+      maxZoom: 19
+    }).addTo(mapInstanceRef.current);
+    // Bring layerGroup to front
+    if (layerGroupRef.current) {
+      layerGroupRef.current.eachLayer((layer) => {
+        if ('bringToFront' in layer) (layer as any).bringToFront();
+      });
+    }
+  }, [mapStyle]);
 
   // Update markers and circle when spot, hotels, or selectedHotelId changes
   useEffect(() => {
@@ -175,6 +207,43 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   return (
     <div className="relative w-full h-[380px] rounded-2xl overflow-hidden shadow-inner border border-slate-200 bg-slate-100">
       <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+      {/* Map Style Switcher (Street / Satellite / OSM) - 100% Free & Zero Watermarks */}
+      <div className="absolute top-3 left-14 z-[1000] flex items-center bg-white/95 backdrop-blur-sm p-1 rounded-xl shadow-md border border-slate-200 text-xs font-semibold">
+        <button
+          type="button"
+          onClick={() => setMapStyle('street')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            mapStyle === 'street'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          🗺️ Street
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapStyle('satellite')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            mapStyle === 'satellite'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          🛰️ Satellite
+        </button>
+        <button
+          type="button"
+          onClick={() => setMapStyle('osm')}
+          className={`px-2.5 py-1 rounded-lg transition-all ${
+            mapStyle === 'osm'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          🌍 OpenStreetMap
+        </button>
+      </div>
       
       {/* Map Legend Overlay */}
       <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl p-3 shadow-md z-[1000] text-xs space-y-1.5 pointer-events-none">
@@ -192,7 +261,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         </div>
         <div className="flex items-center gap-2 text-slate-500 text-[11px] pt-1 border-t border-slate-100">
           <div className="w-3 h-3 rounded-full border-2 border-dashed border-indigo-500"></div>
-          <span>5 km Spatial Boundary</span>
+          <span>{radiusKm} km Spatial Boundary</span>
         </div>
       </div>
     </div>
