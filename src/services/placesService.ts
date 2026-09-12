@@ -324,8 +324,135 @@ export const GLOBAL_DESTINATIONS: Record<string, {
         localTip: 'Bundle your licensed Parisian guide to skip standard multi-hour museum security lines.'
       }
     ]
+  },
+  'udaipur': {
+    name: 'City Palace & Lake Pichola',
+    city: 'Udaipur',
+    country: 'India',
+    location: { lat: 24.5764, lng: 73.6835 },
+    category: 'City of Lakes & Rajput Royalty',
+    monthlyCheckins: 115000,
+    highlight: 'Majestic marble palace complex towering over shimmering Lake Pichola',
+    languages: ['English', 'Hindi', 'Rajasthani'],
+    hotelThemes: [
+      { name: 'Pichola Lakefront Haveli', tier: 'Heritage Luxury', basePrice: 5200, perks: ['Private Sunset Boat Ride', 'Rooftop Palace View', 'Royal Rajasthani Thali'] },
+      { name: 'Jagdish Temple Boutique Inn', tier: 'Boutique Stay', basePrice: 3400, perks: ['Temple Walking Proximity', 'Courtyard Folk Sitar', 'Late Check-out'] },
+      { name: 'Fateh Sagar Lakeside Retreat', tier: 'Urban Comfort', basePrice: 2700, perks: ['Lakeside Promenade Pass', 'Complimentary Chai', 'Free Parking'] }
+    ],
+    guideProfiles: [
+      { name: 'Bhanwar Singh', title: 'Mewar Royal Historian & Lake Palace Escort', specialties: ['Mewar Dynasty History', 'Lake Pichola Boat Walks', 'Miniature Painting Art'], languages: ['English', 'Hindi', 'Rajasthani'], fee: 1600 }
+    ],
+    itineraryDays: [
+      {
+        title: 'City Palace Splendor & Sunset Lake Pichola Boat Ride',
+        activities: [
+          '09:00 AM: Guided walk through the magnificent courtyards and crystal gallery of City Palace',
+          '01:30 PM: Traditional Mewari lunch at rooftop lakeside terrace',
+          '05:00 PM: Golden hour boat cruise around Jag Mandir island on Lake Pichola'
+        ],
+        localTip: 'Visit City Palace before 10:30 AM to explore the mirror halls with low crowds.'
+      }
+    ]
+  },
+  'amritsar': {
+    name: 'Harmandir Sahib (Golden Temple)',
+    city: 'Amritsar',
+    country: 'India',
+    location: { lat: 31.6200, lng: 74.8765 },
+    category: 'Sacred Sikh Shrine & Spiritual Haven',
+    monthlyCheckins: 195000,
+    highlight: 'Dazzling gilded gurdwara surrounded by the sacred Amrit Sarovar pool of nectar',
+    languages: ['English', 'Punjabi', 'Hindi'],
+    hotelThemes: [
+      { name: 'The Golden Heritage Suites', tier: 'Heritage Luxury', basePrice: 3600, perks: ['Heritage Street Walk Escort', 'Langar Experience Pass', 'Complimentary Breakfast'] },
+      { name: 'Amrit Sarovar Boutique Stay', tier: 'Boutique Stay', basePrice: 2800, perks: ['24/7 Temple Shuttle', 'Kulcha Tasting Voucher', 'Late Check-out'] }
+    ],
+    guideProfiles: [
+      { name: 'Harpreet Singh', title: 'Sikh History Scholar & Heritage Street Guide', specialties: ['Golden Temple History', 'Langar Community Kitchen', 'Amritsari Culinary Trail'], languages: ['English', 'Punjabi', 'Hindi'], fee: 1400 }
+    ],
+    itineraryDays: [
+      {
+        title: 'Spiritual Dawn at the Golden Temple & Culinary Trail',
+        activities: [
+          '05:30 AM: Witness the serene Palki Sahib morning procession around the sacred pool',
+          '09:00 AM: Iconic Amritsari Kulcha breakfast at legendary local street dining partner',
+          '01:00 PM: Volunteer and experience the monumental community kitchen (Langar)',
+          '04:30 PM: Wagah Border flag-lowering beating retreat ceremony excursion'
+        ],
+        localTip: 'Head covering is mandatory; scarves are provided free at the temple entrance gates.'
+      }
+    ]
+  },
+  'kolkata': {
+    name: 'Victoria Memorial & Howrah Bridge',
+    city: 'Kolkata',
+    country: 'India',
+    location: { lat: 22.5448, lng: 88.3426 },
+    category: 'Cultural Capital of India',
+    monthlyCheckins: 125000,
+    highlight: 'Majestic white Makrana marble monument and iconic cantilever bridge over the Hooghly',
+    languages: ['English', 'Bengali', 'Hindi'],
+    hotelThemes: [
+      { name: 'Park Street Colonial Heritage Stay', tier: 'Heritage Luxury', basePrice: 4200, perks: ['Colonial Architecture Tour', 'Mishti Doi Welcome', 'High Tea'] },
+      { name: 'Maidan Vista Boutique Hotel', tier: 'Boutique Stay', basePrice: 3100, perks: ['Victoria Memorial Park View', 'Tram Pass Included', 'Late Check-out'] }
+    ],
+    guideProfiles: [
+      { name: 'Debashis Roy', title: 'Calcutta Colonial Historian & Literary Escort', specialties: ['Victorian Architecture', 'College Street Bookshops', 'Bengali Culinary Heritage'], languages: ['English', 'Bengali', 'Hindi'], fee: 1500 }
+    ],
+    itineraryDays: [
+      {
+        title: 'Victoria Memorial Gardens & Hooghly Sunset',
+        activities: [
+          '09:00 AM: Morning stroll through Victoria Memorial hall and landscaped royal gardens',
+          '01:00 PM: Authentic Bengali fish curry thali on Park Street',
+          '05:00 PM: Sunset river ferry across Hooghly river viewing the iconic Howrah Bridge'
+        ],
+        localTip: 'Take the heritage electric tram between Esplanade and Maidan for a nostalgic ride.'
+      }
+    ]
   }
 };
+
+/**
+ * Autocomplete helper that matches destination names, cities, or tags.
+ */
+export function getAutocompleteSuggestions(query: string): {
+  key: string;
+  name: string;
+  city: string;
+  category: string;
+  monthlyCheckins: number;
+}[] {
+  if (!query || query.trim().length < 1) return [];
+  const lower = query.toLowerCase().trim();
+
+  const results: {
+    key: string;
+    name: string;
+    city: string;
+    category: string;
+    monthlyCheckins: number;
+  }[] = [];
+
+  for (const [key, data] of Object.entries(GLOBAL_DESTINATIONS)) {
+    if (
+      key.includes(lower) ||
+      data.city.toLowerCase().includes(lower) ||
+      data.name.toLowerCase().includes(lower) ||
+      data.category.toLowerCase().includes(lower)
+    ) {
+      results.push({
+        key,
+        name: data.name,
+        city: data.city,
+        category: data.category,
+        monthlyCheckins: data.monthlyCheckins
+      });
+    }
+  }
+
+  return results.slice(0, 5);
+}
 
 /**
  * Searches and resolves a destination query into a verified TouristSpot and matching partner inventory.

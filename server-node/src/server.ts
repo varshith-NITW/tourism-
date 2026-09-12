@@ -249,6 +249,34 @@ app.post('/api/ai/search', async (req: Request, res: Response) => {
   }
 });
 
+// Search audit logging (MongoDB / in-memory audit store)
+let recentSearchLogs = [
+  { id: 'srch-1', query: 'Taj Mahal heritage stay under 5000', landmark: 'Taj Mahal', city: 'Agra', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() },
+  { id: 'srch-2', query: 'Goa beach resort with seafood guide', landmark: 'Calangute Coast', city: 'North Goa', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
+  { id: 'srch-3', query: 'Jaipur Hawa Mahal boutique haveli', landmark: 'Hawa Mahal', city: 'Jaipur', timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString() }
+];
+
+// 7. Dynamic Search History & Audit Endpoints
+app.get('/api/search/history', (req: Request, res: Response) => {
+  res.json({ success: true, count: recentSearchLogs.length, history: recentSearchLogs });
+});
+
+app.post('/api/search/log', (req: Request, res: Response) => {
+  const { query, landmark, city, maxBudget, vibe } = req.body;
+  const newLog = {
+    id: `srch-${Date.now()}`,
+    query: query || 'Exploration Search',
+    landmark: landmark || 'Landmark',
+    city: city || 'City',
+    maxBudget: maxBudget || 5000,
+    vibe: vibe || 'cultural',
+    timestamp: new Date().toISOString()
+  };
+  recentSearchLogs.unshift(newLog);
+  if (recentSearchLogs.length > 50) recentSearchLogs.pop();
+  res.status(201).json({ success: true, log: newLog });
+});
+
 // Start HTTP Server immediately
 app.listen(PORT, () => {
   console.log(`🚀 TourMatch Node.js API Gateway running on http://localhost:${PORT}`);
