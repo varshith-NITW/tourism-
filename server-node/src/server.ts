@@ -179,7 +179,59 @@ app.post('/api/bookings/create', async (req: Request, res: Response) => {
   });
 });
 
-// 5. Proxy AI Search to FastAPI Microservice
+// 5. Google Places & Maps API Proxy Endpoints
+app.post('/api/places/test-key', async (req: Request, res: Response) => {
+  const apiKey = req.body.key || process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) {
+    return res.status(400).json({ status: 'ERROR', message: 'No API key provided' });
+  }
+
+  try {
+    const googleRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=Charminar&key=${apiKey}`);
+    const data: any = await googleRes.json();
+
+    if (data.status === 'OK') {
+      return res.json({ status: 'OK', message: 'Google Maps API Connected successfully!' });
+    }
+
+    if (data.status === 'REQUEST_DENIED' && (data.error_message?.includes('billing') || !data.error_message)) {
+      return res.json({
+        status: 'REQUEST_DENIED',
+        billingRequired: true,
+        message: 'Google Cloud requires Billing enabled on this project to activate live API responses.'
+      });
+    }
+
+    return res.json({ status: data.status, message: data.error_message || 'API request failed' });
+  } catch (err: any) {
+    res.status(500).json({ status: 'ERROR', message: err.message });
+  }
+});
+
+app.get('/api/places/search', async (req: Request, res: Response) => {
+  const query = req.query.query as string;
+  const apiKey = (req.headers['x-google-maps-key'] as string) || process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter is required' });
+  }
+
+  if (!apiKey) {
+    return res.json({ source: 'dynamic-engine', message: 'No Google Maps key configured, use dynamic engine' });
+  }
+
+  try {
+    const placesRes = await fetch(
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`
+    );
+    const data: any = await placesRes.json();
+    res.json(data);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 6. Proxy AI Search to FastAPI Microservice
 app.post('/api/ai/search', async (req: Request, res: Response) => {
   try {
     const response = await fetch(`${AI_SERVICE_URL}/ai/recommend`, {
@@ -197,9 +249,12 @@ app.post('/api/ai/search', async (req: Request, res: Response) => {
   }
 });
 
-// Initialize database connections and start server
-connectDatabases().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 TourMatch Node.js API Gateway running on http://localhost:${PORT}`);
+// Start HTTP Server immediately
+app.listen(PORT, () => {
+  console.log(`🚀 TourMatch Node.js API Gateway running on http://localhost:${PORT}`);
+  // Connect databases asynchronously in the background
+  connectDatabases().catch((err) => {
+    console.warn('Database background connection note:', err.message);
   });
 });
+

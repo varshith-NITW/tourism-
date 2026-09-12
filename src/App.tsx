@@ -9,9 +9,11 @@ import { HotelPartnerPortal } from './components/hotel/HotelPartnerPortal';
 import { LocalGuidePortal } from './components/guide/LocalGuidePortal';
 import { SplitPaymentSimulator } from './components/split/SplitPaymentSimulator';
 import { calculateSplitBreakdown } from './services/paymentSplitService';
+import { ApiSettingsModal } from './components/common/ApiSettingsModal';
 
 export function App() {
   const [currentPersona, setCurrentPersona] = useState<PersonaType>('traveler');
+  const [isApiSettingsOpen, setIsApiSettingsOpen] = useState<boolean>(false);
   const [spots] = useState<TouristSpot[]>(INITIAL_TOURIST_SPOTS);
   const [hotels, setHotels] = useState<Hotel[]>(INITIAL_HOTELS);
   const [guides, setGuides] = useState<Guide[]>(INITIAL_GUIDES);
@@ -101,6 +103,7 @@ export function App() {
         currentPersona={currentPersona}
         onSelectPersona={(persona) => setCurrentPersona(persona)}
         bookingCount={bookings.length}
+        onOpenApiSettings={() => setIsApiSettingsOpen(true)}
       />
 
       {/* Main Persona View Container */}
@@ -164,6 +167,12 @@ export function App() {
           onBookingConfirmed={handleBookingConfirmed}
         />
       )}
+
+      {/* In-App Safe API Key & Engine Settings Modal */}
+      <ApiSettingsModal
+        isOpen={isApiSettingsOpen}
+        onClose={() => setIsApiSettingsOpen(false)}
+      />
 
       {/* Persistent Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white py-6">

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Compass, Hotel, Users, ShieldCheck, DollarSign, Sparkles, MapPin } from 'lucide-react';
+import { Compass, Hotel, Users, ShieldCheck, DollarSign, Sparkles, MapPin, Key } from 'lucide-react';
+import { getStoredApiKeys } from '../services/placesService';
 
 export type PersonaType = 'traveler' | 'hotel' | 'guide' | 'split';
 
@@ -7,12 +8,14 @@ interface NavbarProps {
   currentPersona: PersonaType;
   onSelectPersona: (persona: PersonaType) => void;
   bookingCount: number;
+  onOpenApiSettings?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentPersona,
   onSelectPersona,
-  bookingCount
+  bookingCount,
+  onOpenApiSettings
 }) => {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
@@ -98,6 +101,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
           </nav>
+
+          {/* Right Action: API Keys Configuration */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onOpenApiSettings}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer group"
+              title="Configure Google Maps & OpenAI API Keys"
+            >
+              <Key className="w-3.5 h-3.5 text-emerald-600 group-hover:rotate-45 transition-transform" />
+              <span className="hidden sm:inline">API Keys</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </button>
+          </div>
 
         </div>
       </div>

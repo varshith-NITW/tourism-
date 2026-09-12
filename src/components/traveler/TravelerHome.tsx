@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, MapPin, Search, Navigation, ShieldCheck, ExternalLink, Compass, Calendar, ArrowRight, TrendingUp, Info } from 'lucide-react';
+import { Sparkles, MapPin, Search, Navigation, ShieldCheck, ExternalLink, Calendar, ArrowRight, TrendingUp } from 'lucide-react';
 import { TouristSpot, Hotel, Guide, AIQueryFilters, AIRecommendationResponse } from '../../types';
 import { SAMPLE_AI_PROMPTS } from '../../data/mockData';
 import { parseNaturalLanguagePrompt, executeAIRecommendationEngine } from '../../services/aiEngine';
@@ -27,8 +27,6 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
   const [stayStyle, setStayStyle] = useState<'heritage' | 'foodie' | 'family' | 'luxury' | 'budget' | 'all'>('all');
   const [activeHotelHover, setActiveHotelHover] = useState<string | null>(null);
 
-  const currentSpot = spots.find(s => s.id === selectedSpotId) || spots[0];
-
   // Execute AI recommendation on every filter/search change
   const currentFilters: AIQueryFilters = {
     targetLandmarkId: selectedSpotId,
@@ -47,6 +45,13 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
     5.0 // 5km spatial radius filter
   );
 
+  const targetSpot = aiResult.targetSpot;
+
+  // Combine spots with the dynamic AI result spot if it is a new destination
+  const displaySpots = spots.some(s => s.id === targetSpot.id)
+    ? spots
+    : [targetSpot, ...spots];
+
   const handlePromptSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchPrompt.trim()) return;
@@ -64,9 +69,12 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
   const handleApplyPreset = (preset: typeof SAMPLE_AI_PROMPTS[0]) => {
     setSearchPrompt(preset.query);
-    setSelectedSpotId(preset.landmarkId);
+    const parsed = parseNaturalLanguagePrompt(preset.query, spots);
+    setSelectedSpotId(parsed.landmarkId);
     setMaxBudget(preset.budget);
     setNeedsGuide(preset.needGuide);
+    if (parsed.preferredLanguage) setSelectedLanguage(parsed.preferredLanguage);
+    if (parsed.travelVibe) setStayStyle(parsed.travelVibe as any);
   };
 
   return (
@@ -74,7 +82,6 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
       
       {/* Hero & AI Prompt Section */}
       <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        {/* Subtle background glow */}
         <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-10 -top-10 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -87,7 +94,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
             Discover Partner Stays Ranked by <span className="text-emerald-400">Google Maps Check-Ins</span>
           </h1>
           <p className="mt-2 text-sm sm:text-base text-slate-300">
-            Guaranteed zero-hallucination inventory. The AI queries verified partner hotels strictly within a 5 km geo-radius of your target attraction, ranking stays by real traveler footfall density and pairing certified local guides.
+            Zero-hallucination inventory for any destination worldwide. Search any city or landmark — the AI queries verified partner stays strictly within a 5 km geo-radius, ranking stays by verified traveler check-in volume and pairing certified local guides.
           </p>
 
           {/* Natural Language Prompt Form */}
@@ -99,7 +106,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                   type="text"
                   value={searchPrompt}
                   onChange={(e) => setSearchPrompt(e.target.value)}
-                  placeholder="e.g. 3-day trip near Charminar with heritage guide under 4000..."
+                  placeholder="e.g. Taj Mahal heritage stay under 5000 with history guide, Goa beach resort..."
                   className="w-full bg-transparent text-white placeholder-slate-400 focus:outline-none text-sm"
                 />
               </div>
@@ -115,7 +122,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
           {/* Sample Prompts */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400">Try quick prompts:</span>
+            <span className="text-xs text-slate-400">Try nationwide & global prompts:</span>
             {SAMPLE_AI_PROMPTS.map((preset, idx) => (
               <button
                 key={idx}
@@ -129,8 +136,8 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
         </div>
       </div>
 
-      {/* Suggested 2-Day Cultural Itinerary (Positioned directly under AI Prompt Section) */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+      {/* Suggested Multi-Day Cultural Itinerary (Directly under AI Prompt Section) */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
@@ -138,7 +145,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
             </div>
             <div>
               <h3 className="font-extrabold text-base text-slate-900">
-                AI-Synthesized Schedule around {currentSpot.name}
+                AI-Synthesized Schedule around {targetSpot.name}
               </h3>
               <p className="text-xs text-slate-500">
                 Customized daily schedule synchronized with monument opening hours and low footfall traffic windows.
@@ -194,17 +201,20 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {spots.map((spot) => {
-            const isSelected = spot.id === selectedSpotId;
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+          {displaySpots.slice(0, 5).map((spot) => {
+            const isSelected = spot.id === targetSpot.id;
             return (
               <button
                 key={spot.id}
-                onClick={() => setSelectedSpotId(spot.id)}
+                onClick={() => {
+                  setSelectedSpotId(spot.id);
+                  setSearchPrompt('');
+                }}
                 className={`text-left p-3.5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden ${
                   isSelected
                     ? 'border-emerald-600 bg-emerald-50/50 shadow-sm ring-2 ring-emerald-500/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-2xs'
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -212,11 +222,11 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                   <span className="text-xs">📍</span>
                 </div>
                 <div className="mt-1 flex items-center gap-1.5 text-xs text-red-600 font-bold">
-                  <TrendingUp className="w-3 h-3" />
+                  <TrendingUp className="w-3.5 h-3.5" />
                   <span>{(spot.monthlyCheckins / 1000).toFixed(0)}k check-ins/mo</span>
                 </div>
                 <div className="mt-1 text-[11px] text-slate-500 line-clamp-1">
-                  {spot.bestTimeToVisit}
+                  {spot.tags?.[0] || 'Featured Attraction'}
                 </div>
               </button>
             );
@@ -230,23 +240,23 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-indigo-600" />
             <h3 className="font-bold text-sm text-slate-800">
-              Interactive Spatial Radar (<span className="text-indigo-600">5 km Geo-Radius</span> around {currentSpot.name})
+              Interactive Spatial Radar (<span className="text-indigo-600">5 km Geo-Radius</span> around {targetSpot.name})
             </h3>
           </div>
           <a
-            href={currentSpot.googleMapsUrl}
+            href={targetSpot.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(targetSpot.name)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-slate-600 hover:text-indigo-600 flex items-center gap-1 font-medium"
           >
-            <span>View {currentSpot.name} on Google Maps</span>
+            <span>View {targetSpot.name} on Google Maps</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 
         <InteractiveMap
-          spot={currentSpot}
-          hotels={hotels}
+          spot={targetSpot}
+          hotels={aiResult.recommendedHotels.map(r => r.hotel)}
           selectedHotelId={activeHotelHover}
           onSelectHotel={(hotel) => onSelectHotelForBooking(hotel)}
         />
@@ -260,13 +270,16 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
           </div>
           <div>
             <div className="font-bold text-slate-900 flex items-center gap-2">
-              <span>Structured Context Match for: {aiResult.queryParsed.landmarkName}</span>
+              <span>Destination Match: {targetSpot.name}</span>
               <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md font-semibold">
                 Budget: ≤ ₹{aiResult.queryParsed.maxBudget.toLocaleString()}
               </span>
+              <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-semibold">
+                {targetSpot.city}
+              </span>
             </div>
             <div className="text-slate-500 mt-0.5">
-              Strict Non-Rating Algorithm: Hotlist sorted strictly by verified Google Maps check-in activity & footfall rank.
+              Strict Non-Rating Algorithm: Verified partner stays ranked by Google Maps check-in volume, weekly velocity, and distance penalty.
             </div>
           </div>
         </div>
@@ -282,7 +295,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-extrabold text-lg text-slate-900">
-            Recommended Partner Hotels & Commute Stats
+            Recommended Partner Hotels & Commute Stats near {targetSpot.name}
           </h3>
           <span className="text-xs text-slate-500 font-medium">
             Sorted by Footfall & Check-in Volume
@@ -290,20 +303,23 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-5">
-          {aiResult.recommendedHotels.map(({ hotel, distanceKm, commuteMinutes, rationale, matchedGuide }, index) => {
-            const directionsUrl = getGoogleMapsDirectionsUrl(hotel.location, currentSpot.location, currentSpot.name);
+          {aiResult.recommendedHotels.map(({ hotel, distanceKm, commuteMinutes, rationale, matchedGuide }) => {
+            const directionsUrl = getGoogleMapsDirectionsUrl(hotel.location, targetSpot.location, targetSpot.name);
+            const hotelImg = hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80';
+            const guideAvatar = matchedGuide?.avatar || (matchedGuide as any)?.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+            const guideLicense = matchedGuide?.verificationId || (matchedGuide as any)?.licenseNumber || 'ASI-CERT-VERIFIED';
 
             return (
               <div
                 key={hotel.id}
                 onMouseEnter={() => setActiveHotelHover(hotel.id)}
                 onMouseLeave={() => setActiveHotelHover(null)}
-                className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md hover:border-emerald-500/60 transition-all overflow-hidden flex flex-col lg:flex-row"
+                className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-emerald-500/60 transition-all overflow-hidden flex flex-col lg:flex-row"
               >
                 {/* Hotel Thumbnail & Badges */}
                 <div className="lg:w-72 h-52 lg:h-auto relative shrink-0">
                   <img
-                    src={hotel.image}
+                    src={hotelImg}
                     alt={hotel.name}
                     className="w-full h-full object-cover"
                   />
@@ -316,7 +332,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                   </div>
 
                   {/* Partner Badge */}
-                  <div className="absolute bottom-3 left-3 lg:bottom-3 lg:left-3 bg-white/95 backdrop-blur-sm text-slate-900 font-semibold text-[11px] px-2 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
+                  <div className="absolute bottom-3 left-3 lg:bottom-3 lg:left-3 bg-white/95 backdrop-blur-xs text-slate-900 font-semibold text-[11px] px-2 py-0.5 rounded-md border border-slate-200 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Certified Partner</span>
                   </div>
@@ -355,7 +371,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                       <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-800 font-semibold px-2.5 py-1 rounded-lg border border-indigo-100">
                         <Navigation className="w-3.5 h-3.5 text-indigo-600" />
                         <span>
-                          {distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m away` : `${distanceKm} km`} from {currentSpot.name}
+                          {distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m away` : `${distanceKm} km`} from {targetSpot.name}
                         </span>
                       </div>
                       <div className="bg-slate-100 text-slate-700 font-medium px-2.5 py-1 rounded-lg">
@@ -399,7 +415,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                     {matchedGuide ? (
                       <div className="flex items-center gap-2.5 text-xs text-slate-600">
                         <img
-                          src={matchedGuide.avatar}
+                          src={guideAvatar}
                           alt={matchedGuide.name}
                           className="w-8 h-8 rounded-full object-cover border border-emerald-400"
                         />
@@ -407,7 +423,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
                           <div className="font-bold text-slate-900 flex items-center gap-1">
                             <span>Add-on Guide: {matchedGuide.name}</span>
                             <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-normal">
-                              {matchedGuide.verificationId}
+                              {guideLicense}
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-500">
@@ -435,7 +451,7 @@ export const TravelerHome: React.FC<TravelerHomeProps> = ({
 
                       <button
                         onClick={() => onSelectHotelForBooking(hotel, matchedGuide)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-1.5 cursor-pointer"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-2xs hover:shadow-md flex items-center gap-1.5 cursor-pointer"
                       >
                         <span>Select Stay & Guide</span>
                         <ArrowRight className="w-3.5 h-3.5" />

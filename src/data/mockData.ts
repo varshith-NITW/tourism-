@@ -334,31 +334,45 @@ export const INITIAL_GUIDES: Guide[] = [
 
 export const SAMPLE_AI_PROMPTS = [
   {
-    label: '🔥 High-Checkin Stay Near Charminar',
-    query: 'Show me the top checked-in stay near Charminar with an English speaking heritage guide for a couple trip under 4000',
-    landmarkId: 'spot-charminar',
-    budget: 4000,
-    needGuide: true
-  },
-  {
-    label: '🏰 Golconda Fort View & Photography Walk',
-    query: 'Find a popular stay close to Golconda Fort with sunset photo guide package under 5000',
-    landmarkId: 'spot-golconda',
+    label: '🕌 Taj Mahal Heritage Stay',
+    query: 'Find a verified heritage stay near Taj Mahal under 5000 with a Mughal architecture guide',
+    landmarkId: 'spot-taj-mahal',
     budget: 5000,
     needGuide: true
   },
   {
-    label: '🍲 Old City Food & Bazaar Discovery',
-    query: 'Looking for a verified stay near Chowmahalla Palace with culinary street food guide',
-    landmarkId: 'spot-chowmahalla',
-    budget: 6000,
+    label: '🏖️ Goa Beachfront & Seafood',
+    query: 'Show me top checked-in beach resort in Goa under 4500 with a coastal food guide',
+    landmarkId: 'spot-goa',
+    budget: 4500,
     needGuide: true
   },
   {
-    label: '💎 Museum Culture & Budget Comfort',
-    query: 'Comfortable budget stay near Salar Jung Museum under 2500 per night',
-    landmarkId: 'spot-salarjung',
-    budget: 2500,
-    needGuide: false
+    label: '🏰 Jaipur Royal Haveli',
+    query: 'Looking for a royal boutique stay near Hawa Mahal Jaipur with bazaar escort under 4000',
+    landmarkId: 'spot-jaipur',
+    budget: 4000,
+    needGuide: true
+  },
+  {
+    label: '🌊 Mumbai Gateway Harbor',
+    query: 'Boutique stay near Gateway of India Mumbai with heritage architecture escort under 5500',
+    landmarkId: 'spot-mumbai',
+    budget: 5500,
+    needGuide: true
+  },
+  {
+    label: '🪔 Varanasi Sacred Ghats',
+    query: 'Sacred riverfront stay near Dashashwamedh Ghat Varanasi with morning boat escort under 3500',
+    landmarkId: 'spot-varanasi',
+    budget: 3500,
+    needGuide: true
+  },
+  {
+    label: '🔥 Charminar Heritage Walk',
+    query: 'Show me top checked-in stay near Charminar with heritage guide for a couple trip under 4000',
+    landmarkId: 'spot-charminar',
+    budget: 4000,
+    needGuide: true
   }
 ];

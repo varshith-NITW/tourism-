@@ -18,7 +18,11 @@ export const pgPool = new Pool({
 
 // 2. Redis Cache Client
 export const redisClient = createClient({
-  url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`
+  url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
+  socket: {
+    reconnectStrategy: false,
+    connectTimeout: 1500
+  }
 });
 
 redisClient.on('error', (err) => console.warn('Redis Cache Notice (Running in Local Mode):', err.message));
